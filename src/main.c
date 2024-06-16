@@ -4,7 +4,6 @@
 
 void print_file(unsigned char* buffer, size_t size);
 size_t get_file_size(FILE *file);
-int disassemble8080Opcode(unsigned char *buffer, int pc);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
