@@ -39,8 +39,9 @@ int main(int argc, char **argv) {
 
     fread(buffer, file_buff_size, 1, file);
 
-    for (int i = 0; i < file_buff_size; i++) {
-        disassemble8080Opcode(buffer, i);
+    int pc = 0;
+    while(pc < file_buff_size) {
+        pc += disassemble8080Opcode(buffer, pc);
     }
 
     free(buffer);
