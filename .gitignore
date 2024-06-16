@@ -1,3 +1,4 @@
 src/*.o
-src/invaders.h
+src/invaders*
 src/main
+.vscode
