@@ -35,7 +35,16 @@ void ret(State8080* state);
 void push(State8080* state, uint8_t reg_hi, uint8_t reg_lo);
 void pop(State8080* state, uint8_t* reg_hi, uint8_t* reg_lo);
 int parity(uint8_t num);
-void add_to_accumulator(State8080* state, uint16_t num);
-void adc(State8080* state, uint16_t num);
+void add_to_accumulator(State8080* state, uint8_t num);
+void adc(State8080* state, uint8_t num);
+void subtract_to_accumulator(State8080* state, uint8_t num);
+void sbb(State8080* state, uint8_t num);
+void ana(State8080* state, uint8_t num);
+void xra(State8080* state, uint8_t num);
+void ora(State8080* state, uint8_t num);
+void cmp(State8080* state, uint8_t num);
+void inr(State8080* state, uint8_t* reg);
+void dcr(State8080* state, uint8_t* reg);
+void dad(State8080* state, uint16_t num);
 
 #endif
