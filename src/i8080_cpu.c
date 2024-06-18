@@ -940,16 +940,16 @@ void emulate_i8080_op(State8080* state) {
             }
             break;    
         case 0xf5:                  // PUSH PSW
-                uint16_t psw = (state->a << 8) | 
-                                ((state->cc.s & 0x80) |
-                                (state->cc.z & 0x40) |
-                                (state->cc.ac & 0x10) |
-                                (state->cc.p & 0x04) |
-                                (state->cc.cy & 0x01));
+            uint16_t psw = (state->a << 8) | 
+                            ((state->cc.s & 0x80) |
+                            (state->cc.z & 0x40) |
+                            (state->cc.ac & 0x10) |
+                            (state->cc.p & 0x04) |
+                            (state->cc.cy & 0x01));
 
-                state->memory[state->sp - 1] = (psw >> 8) & 0xff;
-                state->memory[state->sp - 2] = psw & 0xff;
-                state->sp -= 2;
+            state->memory[state->sp - 1] = (psw >> 8) & 0xff;
+            state->memory[state->sp - 2] = psw & 0xff;
+            state->sp -= 2;
             break;
         case 0xf6:                  // ORI D8
             state->a = state->a | opcode[1];
