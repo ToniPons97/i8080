@@ -1135,7 +1135,7 @@ void inr(State8080* state, uint8_t* reg) {
     state->cc.z = (result & 0xff) == 0;
     state->cc.s = (result & 0x80) != 0;
     state->cc.p = parity(result & 0xff);
-    state->cc.ac = result > 0xff;
+    state->cc.ac = ((*reg & 0x0F) + 1) > 0x0F;
 
     *reg = result & 0xff;
 }
