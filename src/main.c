@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <termios.h>
+#include <unistd.h>
 #include "i8080_disassembler.h"
 #include "i8080_cpu.h"
 
@@ -8,6 +10,8 @@ size_t get_file_size(FILE *file);
 unsigned char* read_file(FILE* file, size_t buffer_size);
 void read_file_at_offset(State8080* state, char* filename, uint32_t offset);
 void print_cpu_status(State8080* state);
+void set_raw_mode(struct termios *original);
+void restore_mode(struct termios *original);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -16,6 +20,12 @@ int main(int argc, char **argv) {
 
         return 1;
     }
+
+    struct termios original;
+    char key;
+
+    // Set terminal to raw mode
+    set_raw_mode(&original);
 
     FILE *file = NULL;
     size_t file_size = 0;
@@ -43,21 +53,20 @@ int main(int argc, char **argv) {
     read_file_at_offset(state, "invaders.f", 0x1000);
     read_file_at_offset(state, "invaders.e", 0x1800);
 
-    int pc = 0;
-    char stepper = '\0';
     while(state->pc < file_size) {
-        scanf("%c", &stepper);
+        read(STDIN_FILENO, &key, 1);
 
-        if (stepper != 's') {
-            pc += disassemble8080Opcode(state->memory, state->pc); 
-            emulate_i8080(state);
-        } else {
+        if (key == 's') {
             print_cpu_status(state);
+        } else {
+            disassemble8080Opcode(state->memory, state->pc); 
+            emulate_i8080(state);
         }
     }
 
     free(buffer);
     free(state);
+    restore_mode(&original);
 
     return 0;
 }
@@ -118,4 +127,18 @@ void print_cpu_status(State8080* state) {
     
     printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\n\n", 
         state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p);
+}
+
+// Function to set terminal to raw mode
+void set_raw_mode(struct termios *original) {
+    struct termios raw;
+    tcgetattr(STDIN_FILENO, &raw);
+    *original = raw;
+    raw.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+}
+
+// Function to restore terminal to original mode
+void restore_mode(struct termios *original) {
+    tcsetattr(STDIN_FILENO, TCSANOW, original);
 }
