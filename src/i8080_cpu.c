@@ -75,7 +75,7 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0x0d: {                  // DCR C
-            dcr(state, state->c);
+            dcr(state, &state->c);
             break;
         }   
         case 0x0e: {                  // MVI C,D8 
@@ -122,8 +122,9 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0x17: {                  // RAL
-            state->cc.cy = state->a & 0x80;
+            uint8_t msb = (state->a & 0x80) != 0;
             state->a = (state->a << 1) | (state->cc.cy << 7);
+            state->cc.cy = msb;
             break;
         }   
         case 0x18: break;    
@@ -957,7 +958,6 @@ void emulate_i8080(State8080* state) {
     case 0xff: call(state, 0x38); break;    // 	RST 7
     }    
     state->pc += 1;
-    return;
 }
 
 void call(State8080* state, uint16_t address) {
