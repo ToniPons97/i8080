@@ -660,6 +660,7 @@ void emulate_i8080(State8080* state) {
         case 0xc3: {                  // JMP adr
             uint16_t address = (opcode[2] << 8) | opcode[1];
             state->pc = address;
+            state->pc -= 1;
             break;
         }    
         case 0xc4: {                  // CNZ adr
@@ -967,7 +968,7 @@ void call(State8080* state, uint16_t address) {
     state->memory[state->sp - 1] = pc_hi;
     state->memory[state->sp - 2] = pc_lo;
     state->sp += 2;
-    state->pc = address;
+    state->pc = address - 1;
 }
 
 void ret(State8080* state) {
