@@ -29,7 +29,7 @@ typedef struct State8080 {
 } State8080;
 
 void unimplemented_instruction(State8080* state);
-void emulate_i8080_op(State8080* state);
+void emulate_i8080(State8080* state);
 void call(State8080* state, uint16_t address);
 void ret(State8080* state);
 void push(State8080* state, uint8_t reg_hi, uint8_t reg_lo);
@@ -46,5 +46,6 @@ void cmp(State8080* state, uint8_t num);
 void inr(State8080* state, uint8_t* reg);
 void dcr(State8080* state, uint8_t* reg);
 void dad(State8080* state, uint16_t num);
+State8080* init_8080_state(void);
 
 #endif

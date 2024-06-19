@@ -1,21 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "i8080_disassembler.h"
+#include "i8080_cpu.h"
 
 void print_file(unsigned char* buffer, size_t size);
 size_t get_file_size(FILE *file);
+unsigned char* read_file(FILE* file, size_t buffer_size);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
         printf("[!] Binary not provided...\n");
-        printf("Example usage: ./%s pong.bin\n", argv[0]);
+        printf("Example usage: ./%s space-invaders.bin\n", argv[0]);
 
         return 1;
     }
 
-    unsigned char* buffer = NULL;
     FILE *file = NULL;
-    size_t file_buff_size = 0;
+    size_t file_size = 0;
 
     printf("Dissasembling %s\n", argv[1]);
 
@@ -25,27 +26,36 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    file_buff_size = get_file_size(file);
-    if (file_buff_size == -1) {
-        perror("Error getting buffer size. Exiting program.");
+    file_size = get_file_size(file);
+    if (file_size == -1) {
+        perror("Error reading buffer size. Exiting program.");
         return 1;
     }
 
-    buffer = (unsigned char*) calloc(file_buff_size, sizeof(unsigned char));
-    if (buffer == NULL) {
-        perror("could not allocate memory dynamically.");
-        return 1;
-    }
+    unsigned char* buffer = read_file(file, file_size);
 
-    fread(buffer, file_buff_size, 1, file);
+    State8080* state = init_8080_state();
+
+    state->memory = buffer;
 
     int pc = 0;
-    while(pc < file_buff_size) {
-        pc += disassemble8080Opcode(buffer, pc);
+    char stepper = '\0';
+    while(pc < file_size) {
+        scanf("%c", &stepper);
+
+        if (stepper != 's') {
+            pc += disassemble8080Opcode(buffer, pc); 
+            emulate_i8080(state);
+        } else {
+            printf("\nA: 0x%.2x\nB: 0x%.2x\nC: 0x%.2x\nD: 0x%.2x\nE: 0x%.2x\nH: 0x%.2x\nL: 0x%.2x\n\n", state->a, state->b, state->c, state->d, state->e, state->h, state->l);
+            printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\n\n", state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p);
+        }
+
     }
 
-    free(buffer);
     fclose(file);
+    free(buffer);
+    free(state);
 
     return 0;
 }
@@ -55,7 +65,7 @@ void print_file(unsigned char* buffer, size_t size) {
         printf("%.2x ", buffer[i]);
 }
 
-size_t get_file_size(FILE *file) {
+size_t get_file_size(FILE* file) {
     size_t size;
 
     if (file == NULL) {
@@ -68,4 +78,16 @@ size_t get_file_size(FILE *file) {
     rewind(file);
 
     return size;
+}
+
+unsigned char* read_file(FILE* file, size_t buffer_size) {
+    unsigned char* buffer = NULL;
+    buffer = (unsigned char*) calloc(buffer_size, sizeof(unsigned char));
+    if (buffer == NULL) {
+        perror("could not allocate memory dynamically.");
+        return NULL;
+    }
+
+    fread(buffer, buffer_size, 1, file);
+    return buffer;
 }
