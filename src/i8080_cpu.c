@@ -834,8 +834,13 @@ void emulate_i8080_op(State8080* state) {
             }
             break;    
         case 0xe3:                  // XTHL
-            // L <-> (SP); H <-> (SP+1)
-            unimplemented_instruction(state);
+            uint8_t temp = state->l;
+            state->l = state->memory[state->sp];
+            state->memory[state->sp] = temp;
+
+            temp = state->h;
+            state->h = state->memory[state->sp + 1];
+            state->memory[state->sp + 1] = temp;
             break;    
         case 0xe4:                  // CPO adr
             if (!state->cc.p) {
@@ -904,7 +909,7 @@ void emulate_i8080_op(State8080* state) {
             state->a = result;
             state->pc += 2;
             break;    
-        case 0xef:
+        case 0xef:                  // RST 5
             call(state, 0x28);
             break;    
         case 0xf0:                  // RP
@@ -984,7 +989,10 @@ void emulate_i8080_op(State8080* state) {
             }
             break;    
         case 0xfd: break;    
-        case 0xfe: unimplemented_instruction(state); break;    
+        case 0xfe:                  // 	CPI D8
+            cmp(state, opcode[1]);
+            state->pc += 1;
+            break;    
         case 0xff:                  // 	RST 7
             call(state, 0x38);
             break;    
@@ -1072,7 +1080,7 @@ void sbb(State8080* state, uint8_t num) {
     
     state->cc.z = ((result & 0xff) == 0);
     state->cc.s = ((result & 0x80) != 0);
-    state->cc.cy = (state->a < num) || (state->cc.cy && (state->a - num - 1 > state->a));
+    state->cc.cy = (state->a < num + state->cc.cy);;
     state->cc.p = parity(result & 0xff);
     
     state->a = result & 0xff;
@@ -1116,7 +1124,8 @@ void cmp(State8080* state, uint8_t num) {
 
     state->cc.z = (result & 0xff) == 0;
     state->cc.s = (result & 0x80) != 0;
-    state->cc.cy = result > 0xff;
+    state->cc.cy = state->a < num;
+    state->cc.ac = ((state->a & 0x0F) < (num & 0x0F));
     state->cc.p = parity(result & 0xff);
 }
 
