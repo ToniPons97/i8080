@@ -3,7 +3,7 @@
 int disassemble8080Opcode(unsigned char *buffer, int pc) {
     unsigned char *code = &buffer[pc];  
     int opbytes = 1;    
-    printf("%04x ", pc);    
+    printf("0x%04x ", pc);    
     switch (*code)    
     {    
         case 0x00: printf("NOP      "); break;    

@@ -1129,9 +1129,22 @@ State8080* init_8080_state(void)
 }
 
 void print_cpu_status(State8080* state) {
+    printf("\n=========================== START OF CPU STATUS ===========================\n");
     printf("\nA: 0x%.2x\nB: 0x%.2x\nC: 0x%.2x\nD: 0x%.2x\nE: 0x%.2x\nH: 0x%.2x\nL: 0x%.2x\nSP: 0x%.4x\n", 
         state->a, state->b, state->c, state->d, state->e, state->h, state->l, state->sp);
     
     printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\nPC: 0x%.4x\n\n", 
         state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p, state->pc);
+    printf("\n=========================== END OF CPU STATUS ===========================\n\n");
+}
+
+void print_ram_status(State8080* state) {
+    //printf("\n");
+    printf("\n=========================== START OF RAM STATUS ===========================\n\n");
+
+    for (int i = 0; i < 5; i++) {
+        printf("0x%.4x\n", state->memory[state->sp - i]);
+    }
+
+    printf("\n=========================== END OF RAM STATUS ===========================\n\n");
 }

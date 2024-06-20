@@ -59,8 +59,13 @@ int main(int argc, char **argv) {
 
         if (key == 's') {
             print_cpu_status(state);
+        } else if (key == 'n') {
+            printf("[NEXT] ");
+            disassemble8080Opcode(state->memory, state->pc);
+        }else if (key == 'm') {
+            print_ram_status(state);
         } else {
-            disassemble8080Opcode(state->memory, state->pc); 
+            disassemble8080Opcode(state->memory, state->pc);
             emulate_i8080(state);
         }
     }
