@@ -123,14 +123,6 @@ void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size
 	fclose(file);
 }
 
-void print_cpu_status(State8080* state) {
-    printf("\nA: 0x%.2x\nB: 0x%.2x\nC: 0x%.2x\nD: 0x%.2x\nE: 0x%.2x\nH: 0x%.2x\nL: 0x%.2x\nSP: 0x%.4x\n", 
-        state->a, state->b, state->c, state->d, state->e, state->h, state->l, state->sp);
-    
-    printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\n\n", 
-        state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p);
-}
-
 void set_raw_mode(struct termios *original) {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &raw);

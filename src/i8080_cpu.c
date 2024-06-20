@@ -655,7 +655,7 @@ void emulate_i8080(State8080* state) {
             } else {
                 state->pc += 2;
             }
-            break; 
+            break;
         }   
         case 0xc3: {                  // JMP adr
             uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -1126,4 +1126,12 @@ State8080* init_8080_state(void)
 	State8080* state = calloc(1, sizeof(State8080));
 	state->memory = malloc(0x10000);  //16K
 	return state;
+}
+
+void print_cpu_status(State8080* state) {
+    printf("\nA: 0x%.2x\nB: 0x%.2x\nC: 0x%.2x\nD: 0x%.2x\nE: 0x%.2x\nH: 0x%.2x\nL: 0x%.2x\nSP: 0x%.4x\n", 
+        state->a, state->b, state->c, state->d, state->e, state->h, state->l, state->sp);
+    
+    printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\n\n", 
+        state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p);
 }
