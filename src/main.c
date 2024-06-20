@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
     FILE *file = NULL;
     size_t file_size = 0;
 
-    //printf("Debugging %s\n\n", argv[1]);
     print_banner();
 
     file = fopen(argv[1], "rb");
