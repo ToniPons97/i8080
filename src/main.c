@@ -12,6 +12,7 @@ void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size
 void print_cpu_status(State8080* state);
 void set_raw_mode(struct termios *original);
 void restore_mode(struct termios *original);
+void print_banner(void);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -29,7 +30,8 @@ int main(int argc, char **argv) {
     FILE *file = NULL;
     size_t file_size = 0;
 
-    printf("Debugging %s\n\n", argv[1]);
+    //printf("Debugging %s\n\n", argv[1]);
+    print_banner();
 
     file = fopen(argv[1], "rb");
     if (file == NULL) {
@@ -138,4 +140,15 @@ void set_raw_mode(struct termios *original) {
 
 void restore_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, original);
+}
+
+void print_banner() {
+    printf("==============================================================================\n");
+    printf("=                                                                            =\n");
+    printf("=                          Intel 8080 Emulator                               =\n");
+    printf("=                       Disassembler and Debugger                            =\n");
+    printf("=                                                                            =\n");
+    printf("=                       Developed by Toni Pons                               =\n");
+    printf("=                                                                            =\n");
+    printf("==============================================================================\n\n");
 }
