@@ -961,18 +961,18 @@ void emulate_i8080(State8080* state) {
 }
 
 void call(State8080* state, uint16_t address) {
-    uint16_t pc_hi = (state->pc >> 8) & 0xff;
-    uint16_t pc_lo = state->pc & 0xff;
+    uint8_t pc_hi = (state->pc >> 8) & 0xff;
+    uint8_t pc_lo = state->pc & 0xff;
     
     state->memory[state->sp - 1] = pc_hi;
     state->memory[state->sp - 2] = pc_lo;
-    state->sp += 2;
+    state->sp -= 2;
     state->pc = address - 1;
 }
 
 void ret(State8080* state) {
-    uint16_t pc_lo = state->memory[state->sp];
-    uint16_t pc_hi = state->memory[state->sp + 1];
+    uint8_t pc_lo = state->memory[state->sp];
+    uint8_t pc_hi = state->memory[state->sp + 1];
 
     state->pc = (pc_hi << 8) | pc_lo;
     state->sp += 2;
@@ -1135,14 +1135,14 @@ void print_cpu_status(State8080* state) {
     
     printf("\nZ: 0x%.2x\nS: 0x%.2x\nCY: 0x%.2x\nAC: 0x%.2x\nP: 0x%.2x\nPC: 0x%.4x\n\n", 
         state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p, state->pc);
-    printf("\n=========================== END OF CPU STATUS ===========================\n\n");
+    printf("=========================== END OF CPU STATUS ===========================\n\n");
 }
 
 void print_ram_status(State8080* state) {
     //printf("\n");
     printf("\n=========================== START OF RAM STATUS ===========================\n\n");
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
         printf("0x%.4x\n", state->memory[state->sp - i]);
     }
 
