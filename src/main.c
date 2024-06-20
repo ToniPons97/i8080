@@ -8,7 +8,7 @@
 void print_file(unsigned char* buffer, size_t size);
 size_t get_file_size(FILE *file);
 unsigned char* read_file(FILE* file, size_t buffer_size);
-void read_file_at_offset(State8080* state, char* filename, uint32_t offset);
+void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size_t* size);
 void print_cpu_status(State8080* state);
 void set_raw_mode(struct termios *original);
 void restore_mode(struct termios *original);
@@ -24,13 +24,12 @@ int main(int argc, char **argv) {
     struct termios original;
     char key;
 
-    // Set terminal to raw mode
     set_raw_mode(&original);
 
     FILE *file = NULL;
     size_t file_size = 0;
 
-    printf("Dissasembling %s\n", argv[1]);
+    printf("Debugging %s\n\n", argv[1]);
 
     file = fopen(argv[1], "rb");
     if (file == NULL) {
@@ -48,12 +47,14 @@ int main(int argc, char **argv) {
 
     State8080* state = init_8080_state();
 
-    read_file_at_offset(state, "invaders.h", 0);
-    read_file_at_offset(state, "invaders.g", 0x800);
-    read_file_at_offset(state, "invaders.f", 0x1000);
-    read_file_at_offset(state, "invaders.e", 0x1800);
+    size_t size = 0;
 
-    while(state->pc < file_size) {
+    read_file_at_offset(state, "invaders.h", 0, &size);
+    read_file_at_offset(state, "invaders.g", 0x800, &size);
+    read_file_at_offset(state, "invaders.f", 0x1000, &size);
+    read_file_at_offset(state, "invaders.e", 0x1800, &size);
+
+    while(state->pc < size) {
         read(STDIN_FILENO, &key, 1);
 
         if (key == 's') {
@@ -105,20 +106,21 @@ unsigned char* read_file(FILE* file, size_t buffer_size) {
     return buffer;
 }
 
-void read_file_at_offset(State8080* state, char* filename, uint32_t offset) {
-	FILE *f = fopen(filename, "rb");
-	if (f == NULL) {
-		printf("error: Couldn't open %s\n", filename);
-		exit(1);
-	}
+void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size_t* size) {
+    FILE* file = NULL;
 
-	fseek(f, 0L, SEEK_END);
-	int fsize = ftell(f);
-	fseek(f, 0L, SEEK_SET);
+    file = fopen(filename, "rb");
+    if (file == NULL) {
+        perror("Error opening file.");
+        return;
+    }
+
+    size_t fsize = get_file_size(file);
+    *size += fsize;
 	
 	uint8_t *buffer = &state->memory[offset];
-	fread(buffer, fsize, 1, f);
-	fclose(f);
+	fread(buffer, fsize, 1, file);
+	fclose(file);
 }
 
 void print_cpu_status(State8080* state) {
@@ -129,7 +131,6 @@ void print_cpu_status(State8080* state) {
         state->cc.z, state->cc.s, state->cc.cy, state->cc.ac, state->cc.p);
 }
 
-// Function to set terminal to raw mode
 void set_raw_mode(struct termios *original) {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &raw);
@@ -138,7 +139,6 @@ void set_raw_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, &raw);
 }
 
-// Function to restore terminal to original mode
 void restore_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, original);
 }
