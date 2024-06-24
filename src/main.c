@@ -64,7 +64,9 @@ int main(int argc, char **argv) {
             printf("[NEXT] ");
             disassemble8080Opcode(state->memory, state->pc);
         } else if (key == 'm') {
-            print_ram_status(state);
+            print_ram(state);
+        } else if (key == 'v') {
+            print_vram(state);
         } else {
             disassemble8080Opcode(state->memory, state->pc);
             emulate_i8080(state);
