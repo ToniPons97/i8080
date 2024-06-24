@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
         } else if (key == 'n') {
             printf("[NEXT] ");
             disassemble8080Opcode(state->memory, state->pc);
-        }else if (key == 'm') {
+        } else if (key == 'm') {
             print_ram_status(state);
         } else {
             disassemble8080Opcode(state->memory, state->pc);
