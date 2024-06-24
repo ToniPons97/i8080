@@ -946,8 +946,20 @@ void dad(State8080* state, uint16_t num) {
 
 State8080* init_8080_state(void)
 {
-	State8080* state = calloc(1, sizeof(State8080));
+    State8080* state = NULL;
+    
+	state = calloc(1, sizeof(State8080));
+    if (state == NULL) {
+        printf("Error allocating memory for state.\n");
+        exit(1);
+    }
+
 	state->memory = malloc(0x10000);  //16K
+    if (state->memory == NULL) {
+        printf("Error allocating memory for memory buffer.\n");
+        exit(1);
+    }
+
 	return state;
 }
 
@@ -1008,14 +1020,18 @@ void print_vram(State8080* state) {
 State8080* jump_to(State8080* state, uint16_t new_pc) {
     if (new_pc < 0 || new_pc >= state->pc) {
         printf("Invalid program counter\n");
-        return;
+        return state;
     }
 
-    State8080* new_state = init_8080_state();
+    if (state != NULL) {
+        free(state);
+    }
+    
+    state = init_8080_state();
 
     while(state->pc < new_pc) {
-        emulate_i8080(new_state);
+        emulate_i8080(state);
     }
 
-    return new_state;
+    return state;
 }

@@ -152,7 +152,11 @@ int handle_debugger_commands(State8080* state, char key) {
         print_vram(state);
         return 1;
     case 'r':
-        printf("Should rewind\n");
+        uint16_t new_pc;
+        printf("Enter new program counter: ");
+        scanf("Enter new program counter: %x", &new_pc);
+        printf("Jumping to %hx\n", &new_pc);
+        jump_to(state, new_pc);
     default:
         return 0;
     }
