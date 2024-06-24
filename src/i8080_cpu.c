@@ -1004,3 +1004,18 @@ void print_vram(State8080* state) {
 
     printf("\n=========================== END OF VRAM ============================\n\n");
 }
+
+State8080* jump_to(State8080* state, uint16_t new_pc) {
+    if (new_pc < 0 || new_pc >= state->pc) {
+        printf("Invalid program counter\n");
+        return;
+    }
+
+    State8080* new_state = init_8080_state();
+
+    while(state->pc < new_pc) {
+        emulate_i8080(new_state);
+    }
+
+    return new_state;
+}

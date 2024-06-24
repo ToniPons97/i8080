@@ -12,6 +12,7 @@ void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size
 void print_cpu_status(State8080* state);
 void set_raw_mode(struct termios *original);
 void restore_mode(struct termios *original);
+int handle_debugger_commands(State8080* state, char key);
 void print_banner(void);
 
 int main(int argc, char **argv) {
@@ -58,16 +59,7 @@ int main(int argc, char **argv) {
     while(state->pc < size) {
         read(STDIN_FILENO, &key, 1);
 
-        if (key == 's') {
-            print_cpu_status(state);
-        } else if (key == 'n') {
-            printf("[NEXT] ");
-            disassemble8080Opcode(state->memory, state->pc);
-        } else if (key == 'm') {
-            print_ram(state);
-        } else if (key == 'v') {
-            print_vram(state);
-        } else {
+        if (!handle_debugger_commands(state, key)) {
             disassemble8080Opcode(state->memory, state->pc);
             emulate_i8080(state);
         }
@@ -141,6 +133,29 @@ void set_raw_mode(struct termios *original) {
 
 void restore_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, original);
+}
+
+int handle_debugger_commands(State8080* state, char key) {
+    switch (key)
+    {
+    case 's':
+        print_cpu_status(state);
+        return 1;
+    case 'n':
+        printf("[NEXT] ");
+        disassemble8080Opcode(state->memory, state->pc);
+        return 1;
+    case 'm':
+        print_ram(state);
+        return 1;
+    case 'v':
+        print_vram(state);
+        return 1;
+    case 'r':
+        printf("Should rewind\n");
+    default:
+        return 0;
+    }
 }
 
 void print_banner() {
