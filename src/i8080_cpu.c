@@ -504,7 +504,7 @@ void emulate_i8080(State8080* state) {
             state->a = result & 0xff;
             state->pc += 1;
             break; 
-        }   
+        }
         case 0xc7: call(state, 0x00); break;    // 	RST 0
         case 0xc8: if (state->cc.z) ret(state); break;    // RZ
         case 0xc9: ret(state); break;    // RET
