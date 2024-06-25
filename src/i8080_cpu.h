@@ -48,7 +48,7 @@ void dcr(State8080* state, uint8_t* reg);
 void dad(State8080* state, uint16_t num);
 void print_ram(State8080* state);
 void print_vram(State8080* state);
-void rewind_to_address(State8080* state, uint16_t address);
+State8080* jump_to(State8080* state, uint16_t new_pc);
 
 State8080* init_8080_state(void);
 

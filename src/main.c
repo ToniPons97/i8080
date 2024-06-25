@@ -18,7 +18,7 @@ void print_banner(void);
 int main(int argc, char **argv) {
     if (argc != 2) {
         printf("[!] Binary not provided...\n");
-        printf("Example usage: ./%s space-invaders.bin\n", argv[0]);
+        printf("Example usage: %s space-invaders.bin\n", argv[0]);
 
         return 1;
     }
@@ -62,11 +62,21 @@ int main(int argc, char **argv) {
         if (!handle_debugger_commands(state, key)) {
             disassemble8080Opcode(state->memory, state->pc);
             emulate_i8080(state);
-        }
+        } 
     }
 
-    free(buffer);
-    free(state);
+    printf("OUT OF LOOP\nProgram counter: %.4x\n\n", state->pc);
+
+    printf("IS STATE NULL? %p\n", state);
+
+    if (buffer == NULL) {
+        free(buffer);
+    }
+
+    if (state == NULL) {
+        free(state);
+    }
+
     restore_mode(&original);
 
     return 0;
@@ -151,12 +161,15 @@ int handle_debugger_commands(State8080* state, char key) {
     case 'v':
         print_vram(state);
         return 1;
-    case 'r':
+    case 'j':
         uint16_t new_pc;
         printf("Enter new program counter: ");
-        scanf("Enter new program counter: %x", &new_pc);
-        printf("Jumping to %hx\n", &new_pc);
-        jump_to(state, new_pc);
+        scanf("%hu", &new_pc);
+        printf("\nJumping to %hu\n", new_pc);
+        printf("Old state: %p - New state: ", state);
+        *state = *jump_to(state, new_pc);
+        printf("%p\n", state);
+        return 1;
     default:
         return 0;
     }

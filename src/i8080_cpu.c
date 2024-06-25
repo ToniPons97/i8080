@@ -1018,20 +1018,17 @@ void print_vram(State8080* state) {
 }
 
 State8080* jump_to(State8080* state, uint16_t new_pc) {
-    if (new_pc < 0 || new_pc >= state->pc) {
+    if (new_pc >= 0x10000) {  // Assuming maximum address space of 64KB
         printf("Invalid program counter\n");
         return state;
     }
 
-    if (state != NULL) {
-        free(state);
-    }
-    
-    state = init_8080_state();
-
-    while(state->pc < new_pc) {
-        emulate_i8080(state);
+    State8080* new_state = init_8080_state();
+    while (new_state->pc < new_pc) {
+        emulate_i8080(new_state);
     }
 
-    return state;
+    //free(state);
+
+    return new_state;
 }
