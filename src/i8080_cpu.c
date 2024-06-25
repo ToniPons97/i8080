@@ -948,7 +948,7 @@ State8080* init_8080_state(void)
 {
     State8080* state = NULL;
     
-	state = calloc(1, sizeof(State8080));
+	state = (State8080*) calloc(1, sizeof(State8080));
     if (state == NULL) {
         printf("Error allocating memory for state.\n");
         exit(1);
@@ -1017,10 +1017,10 @@ void print_vram(State8080* state) {
     printf("\n=========================== END OF VRAM ============================\n\n");
 }
 
-State8080* jump_to(State8080* state, uint16_t new_pc) {
+State8080 jump_to(State8080* state, uint16_t new_pc) {
     if (new_pc >= 0x10000) {  // Assuming maximum address space of 64KB
         printf("Invalid program counter\n");
-        return state;
+        return *state;
     }
 
     State8080* new_state = init_8080_state();
@@ -1028,7 +1028,5 @@ State8080* jump_to(State8080* state, uint16_t new_pc) {
         emulate_i8080(new_state);
     }
 
-    //free(state);
-
-    return new_state;
+    return *new_state;
 }

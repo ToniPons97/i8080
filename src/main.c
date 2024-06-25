@@ -14,6 +14,9 @@ void set_raw_mode(struct termios *original);
 void restore_mode(struct termios *original);
 int handle_debugger_commands(State8080* state, char key);
 void print_banner(void);
+void load_space_invaders_rom(State8080* state, size_t* size);
+
+size_t size = 0;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -48,13 +51,8 @@ int main(int argc, char **argv) {
     unsigned char* buffer = read_file(file, file_size);
 
     State8080* state = init_8080_state();
-
-    size_t size = 0;
-
-    read_file_at_offset(state, "invaders.h", 0, &size);
-    read_file_at_offset(state, "invaders.g", 0x800, &size);
-    read_file_at_offset(state, "invaders.f", 0x1000, &size);
-    read_file_at_offset(state, "invaders.e", 0x1800, &size);
+ 
+    load_space_invaders_rom(state, &size);
 
     while(state->pc < size) {
         read(STDIN_FILENO, &key, 1);
@@ -165,14 +163,24 @@ int handle_debugger_commands(State8080* state, char key) {
         uint16_t new_pc;
         printf("Enter new program counter: ");
         scanf("%hu", &new_pc);
-        printf("\nJumping to %hu\n", new_pc);
+        printf("\nJumping to %.4x\n", new_pc);
         printf("Old state: %p - New state: ", state);
-        *state = *jump_to(state, new_pc);
+        
+        *state = jump_to(state, new_pc);
+        load_space_invaders_rom(state, &size);
+        
         printf("%p\n", state);
         return 1;
     default:
         return 0;
     }
+}
+
+void load_space_invaders_rom(State8080* state, size_t* size) {
+    read_file_at_offset(state, "invaders.h", 0, size);
+    read_file_at_offset(state, "invaders.g", 0x800, size);
+    read_file_at_offset(state, "invaders.f", 0x1000, size);
+    read_file_at_offset(state, "invaders.e", 0x1800, size);
 }
 
 void print_banner() {
