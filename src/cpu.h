@@ -1,7 +1,7 @@
 #include <stdint.h>
 
-#ifndef I8080_CPU
-#define I8080_CPU
+#ifndef CPU
+#define CPU
 
 typedef struct ConditionCodes {    
     uint8_t    z:1;    

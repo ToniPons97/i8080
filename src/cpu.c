@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "i8080_cpu.h"
+#include "cpu.h"
 
 // https://altairclone.com/downloads/manuals/8080%20Programmers%20Manual.pdf
 

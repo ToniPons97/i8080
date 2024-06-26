@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
-#include "i8080_disassembler.h"
-#include "i8080_cpu.h"
+#include "cpu.h"
 #include "debugger.h"
 
 void print_file(unsigned char* buffer, size_t size);
@@ -60,7 +59,7 @@ int main(int argc, char **argv) {
         read(STDIN_FILENO, &key, 1);
 
         if (!handle_debugger_commands(state, key)) {
-            disassemble8080Opcode(state->memory, state->pc);
+            disassemble(state->memory, state->pc);
             emulate_i8080(state);
         } 
     }
@@ -152,7 +151,7 @@ int handle_debugger_commands(State8080* state, char key) {
             return 1;
         case 'n':
             printf("[NEXT] ");
-            disassemble8080Opcode(state->memory, state->pc);
+            disassemble(state->memory, state->pc);
             return 1;
         case 'm':
             print_ram(state);
@@ -171,7 +170,7 @@ int handle_debugger_commands(State8080* state, char key) {
 
             printf("New pc: 0x%s", new_pc);
             *state = jump_to(state, decimal_pc, load_space_invaders_rom, &space_invaders_size);
-            
+
             return 1;
         default:
             return 0;
