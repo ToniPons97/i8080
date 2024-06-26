@@ -15,6 +15,7 @@ void restore_mode(struct termios *original);
 int handle_debugger_commands(State8080* state, char key);
 void print_banner(void);
 void load_space_invaders_rom(State8080* state, size_t* size);
+uint16_t hex_to_decimal(char* hex_str);
 
 size_t size = 0;
 
@@ -144,35 +145,36 @@ void restore_mode(struct termios *original) {
 }
 
 int handle_debugger_commands(State8080* state, char key) {
-    switch (key)
-    {
-    case 's':
-        print_cpu_status(state);
-        return 1;
-    case 'n':
-        printf("[NEXT] ");
-        disassemble8080Opcode(state->memory, state->pc);
-        return 1;
-    case 'm':
-        print_ram(state);
-        return 1;
-    case 'v':
-        print_vram(state);
-        return 1;
-    case 'j':
-        uint16_t new_pc;
-        printf("Enter new program counter: ");
-        scanf("%hu", &new_pc);
-        printf("\nJumping to %.4x\n", new_pc);
-        printf("Old state: %p - New state: ", state);
-        
-        *state = jump_to(state, new_pc);
-        load_space_invaders_rom(state, &size);
-        
-        printf("%p\n", state);
-        return 1;
-    default:
-        return 0;
+    switch (key) {
+        case 's':
+            print_cpu_status(state);
+            return 1;
+        case 'n':
+            printf("[NEXT] ");
+            disassemble8080Opcode(state->memory, state->pc);
+            return 1;
+        case 'm':
+            print_ram(state);
+            return 1;
+        case 'v':
+            print_vram(state);
+            return 1;
+        case 'j':
+            char new_pc[8];
+            uint16_t decimal_pc;
+
+            printf("Enter new program counter: ");
+            fgets(new_pc, 8, stdin);
+
+            decimal_pc = hex_to_decimal(new_pc);
+
+            printf("New pc: %s", new_pc);
+            *state = jump_to(state, decimal_pc);
+            load_space_invaders_rom(state, &size);
+
+            return 1;
+        default:
+            return 0;
     }
 }
 
@@ -181,6 +183,11 @@ void load_space_invaders_rom(State8080* state, size_t* size) {
     read_file_at_offset(state, "invaders.g", 0x800, size);
     read_file_at_offset(state, "invaders.f", 0x1000, size);
     read_file_at_offset(state, "invaders.e", 0x1800, size);
+}
+
+uint16_t hex_to_decimal(char* hex_str) {
+    unsigned long decimal = strtoul(hex_str, NULL, 16);
+    return (uint16_t) decimal;
 }
 
 void print_banner() {
