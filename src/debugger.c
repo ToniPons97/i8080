@@ -1,4 +1,5 @@
 #include "debugger.h"
+#include "i8080_disassembler.h"
 
 void print_cpu_status(State8080* state) {
     printf("\n=========================== START OF CPU STATUS ===========================\n");
@@ -8,7 +9,8 @@ void print_cpu_status(State8080* state) {
     printf("L:  0x%.2x    SP: 0x%.4x\n", state->l, state->sp);
     printf("\nFlags:\n");
     printf("Z:  0x%.2x    S:  0x%.2x    CY: 0x%.2x\n", state->cc.z, state->cc.s, state->cc.cy);
-    printf("AC: 0x%.2x    P:  0x%.2x    PC: 0x%.4x\n", state->cc.ac, state->cc.p, state->pc);
+    printf("AC: 0x%.2x    P:  0x%.2x    PC: ", state->cc.ac, state->cc.p);
+    disassemble8080Opcode(state->memory, state->pc);
     printf("\n=========================== END OF CPU STATUS ============================\n\n");
 }
 
