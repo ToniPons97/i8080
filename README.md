@@ -18,10 +18,9 @@ Use the following command to compile the emulator:
 
 ```bash
 gcc -c main.c -Wall
-gcc -c i8080_disassembler.c -Wall
-gcc -c i8080_cpu.c -Wall
+gcc -c cpu.c -Wall
 gcc -c debugger.c -Wall
-gcc -o main main.o i8080_disassembler.o i8080_cpu.o debugger.o -Wall
+gcc -o main main.o cpu.o debugger.o -Wall
 ```
 
 Using make:
