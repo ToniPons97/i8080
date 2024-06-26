@@ -651,7 +651,7 @@ void emulate_i8080(State8080* state) {
             state->cc.cy = 0;
             state->cc.p = parity(result);
             state->a = result;
-            state->pc += 2;
+            state->pc += 1;
             break;
         }
         case 0xe7: call(state, 0x20); break;    
