@@ -18,7 +18,7 @@ void print_banner(void);
 void load_space_invaders_rom(State8080* state, size_t* size);
 uint16_t hex_to_decimal(char* hex_str);
 
-size_t size = 0;
+size_t space_invaders_size = 0;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -54,9 +54,9 @@ int main(int argc, char **argv) {
 
     State8080* state = init_8080_state();
  
-    load_space_invaders_rom(state, &size);
+    load_space_invaders_rom(state, &space_invaders_size);
 
-    while(state->pc < size) {
+    while(state->pc < space_invaders_size) {
         read(STDIN_FILENO, &key, 1);
 
         if (!handle_debugger_commands(state, key)) {
@@ -169,10 +169,9 @@ int handle_debugger_commands(State8080* state, char key) {
 
             decimal_pc = hex_to_decimal(new_pc);
 
-            printf("New pc: %s", new_pc);
-            *state = jump_to(state, decimal_pc);
-            load_space_invaders_rom(state, &size);
-
+            printf("New pc: 0x%s", new_pc);
+            *state = jump_to(state, decimal_pc, load_space_invaders_rom, &space_invaders_size);
+            
             return 1;
         default:
             return 0;
@@ -180,6 +179,8 @@ int handle_debugger_commands(State8080* state, char key) {
 }
 
 void load_space_invaders_rom(State8080* state, size_t* size) {
+    *size = 0;
+
     read_file_at_offset(state, "invaders.h", 0, size);
     read_file_at_offset(state, "invaders.g", 0x800, size);
     read_file_at_offset(state, "invaders.f", 0x1000, size);
