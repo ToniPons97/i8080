@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "i8080_disassembler.h"
 #include "i8080_cpu.h"
+#include "debugger.h"
 
 void print_file(unsigned char* buffer, size_t size);
 size_t get_file_size(FILE *file);
