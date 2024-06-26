@@ -875,6 +875,7 @@ void ana(State8080* state, uint8_t num) {
     state->cc.s = (result & 0x80) != 0;
     state->cc.cy = 0;
     state->cc.p = parity(result);
+    state->cc.ac = ((state->a | num) & 0x08) != 0;
 
     state->a = result;
 }

@@ -268,7 +268,7 @@ int disassemble(unsigned char *buffer, int pc) {
 
 void print_cpu_status(State8080* state) {
     printf("\n=========================== START OF CPU STATUS ===========================\n");
-    printf("Registers:\n");
+    printf("\nRegisters:\n");
     printf("A:  0x%.2x    B:  0x%.2x    C:  0x%.2x\n", state->a, state->b, state->c);
     printf("D:  0x%.2x    E:  0x%.2x    H:  0x%.2x\n", state->d, state->e, state->h);
     printf("L:  0x%.2x    SP: 0x%.4x\n", state->l, state->sp);

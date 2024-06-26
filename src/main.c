@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     }
 
     struct termios original;
-    char key;
+    char key = '\0';
 
     set_raw_mode(&original);
 
