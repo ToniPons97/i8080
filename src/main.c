@@ -18,6 +18,7 @@ void load_space_invaders_rom(State8080* state, size_t* size);
 uint16_t hex_to_decimal(char* hex_str);
 
 size_t space_invaders_size = 0;
+int execution_count = 50;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -52,20 +53,27 @@ int main(int argc, char **argv) {
     unsigned char* buffer = read_file(file, file_size);
 
     State8080* state = init_8080_state();
- 
     load_space_invaders_rom(state, &space_invaders_size);
+
+    int counter = 0;
 
     while(state->pc < space_invaders_size) {
         read(STDIN_FILENO, &key, 1);
 
-        if (!handle_debugger_commands(state, key)) {
-            disassemble(state->memory, state->pc);
-            emulate_i8080(state);
-        } 
+        if (handle_debugger_commands(state, key)) {
+            counter = execution_count;
+        } else {
+            
+            while (counter++ < execution_count) {
+                disassemble(state->memory, state->pc);
+                emulate_i8080(state);
+            }
+            
+            counter = 0;
+        }
     }
 
-    printf("OUT OF LOOP\nProgram counter: %.4x\n\n", state->pc);
-
+    printf("OUT OF LOOP\nProgram counter: 0x%.4x\n\n", state->pc);
     printf("IS STATE NULL? %p\n", state);
 
     if (buffer == NULL) {
@@ -124,6 +132,8 @@ void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size
         return;
     }
 
+    printf("Loading %s at 0x%.8x\n", filename, offset);
+
     size_t fsize = get_file_size(file);
     *size += fsize;
 	
@@ -168,9 +178,19 @@ int handle_debugger_commands(State8080* state, char key) {
 
             decimal_pc = hex_to_decimal(new_pc);
 
-            printf("New pc: 0x%s", new_pc);
+            printf("New pc: %s", new_pc);
             *state = jump_to(state, decimal_pc, load_space_invaders_rom, &space_invaders_size);
 
+            return 1;
+        case 'i':
+            printf("Enter number of instructions to execute: ");
+
+            do {
+                if (execution_count < 1)
+                    printf("Negative numbers aren't allowed: ");
+                scanf("%d", &execution_count);
+            } while(execution_count < 1);
+            
             return 1;
         default:
             return 0;
@@ -179,11 +199,11 @@ int handle_debugger_commands(State8080* state, char key) {
 
 void load_space_invaders_rom(State8080* state, size_t* size) {
     *size = 0;
-
     read_file_at_offset(state, "invaders.h", 0, size);
     read_file_at_offset(state, "invaders.g", 0x800, size);
     read_file_at_offset(state, "invaders.f", 0x1000, size);
     read_file_at_offset(state, "invaders.e", 0x1800, size);
+    printf("\n");
 }
 
 uint16_t hex_to_decimal(char* hex_str) {
