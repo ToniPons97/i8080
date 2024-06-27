@@ -284,7 +284,7 @@ void print_ram(State8080* state) {
     printf("Address    Value\n");
     printf("-------    -----\n");
 
-    int range = 10;
+    int range = 50;
     int start = state->sp - range;
     int end = state->sp + range;
 
@@ -331,7 +331,7 @@ State8080 jump_to(State8080* state, uint16_t new_pc, void (*load_code)(State8080
 
     load_code(new_state, size);
 
-    while (new_state->pc < new_pc) {
+    while (new_state->pc != new_pc) {
         emulate_i8080(new_state);
     }
 
