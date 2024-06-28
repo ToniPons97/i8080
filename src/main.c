@@ -19,6 +19,7 @@ uint16_t hex_to_decimal(char* hex_str);
 
 size_t space_invaders_size = 0;
 int execution_count = 50;
+struct termios original;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -28,7 +29,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    struct termios original;
     char key = '\0';
 
     set_raw_mode(&original);
@@ -170,6 +170,7 @@ int handle_debugger_commands(State8080* state, char key) {
             print_vram(state);
             return 1;
         case 'j':
+            restore_mode(&original);
             char new_pc[8];
             uint16_t decimal_pc;
 
@@ -180,9 +181,10 @@ int handle_debugger_commands(State8080* state, char key) {
 
             printf("New pc: %s", new_pc);
             *state = jump_to(state, decimal_pc, load_space_invaders_rom, &space_invaders_size);
-
+            set_raw_mode(&original);
             return 1;
         case 'i':
+            restore_mode(&original);
             printf("Enter number of instructions to execute: ");
 
             do {
@@ -191,6 +193,7 @@ int handle_debugger_commands(State8080* state, char key) {
                 scanf("%d", &execution_count);
             } while(execution_count < 1);
             
+            set_raw_mode(&original);
             return 1;
         default:
             return 0;
