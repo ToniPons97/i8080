@@ -18,7 +18,7 @@ void load_space_invaders_rom(State8080* state, size_t* size);
 uint16_t hex_to_decimal(char* hex_str);
 
 size_t space_invaders_size = 0;
-int execution_count = 50;
+int instruction_count = 1;
 struct termios original;
 
 int main(int argc, char **argv) {
@@ -61,10 +61,9 @@ int main(int argc, char **argv) {
         read(STDIN_FILENO, &key, 1);
 
         if (handle_debugger_commands(state, key)) {
-            counter = execution_count;
+            counter = instruction_count;
         } else {
-            
-            while (counter++ < execution_count) {
+            while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
                 emulate_i8080(state);
             }
@@ -132,8 +131,6 @@ void read_file_at_offset(State8080* state, char* filename, uint32_t offset, size
         return;
     }
 
-    printf("Loading %s at 0x%.8x\n", filename, offset);
-
     size_t fsize = get_file_size(file);
     *size += fsize;
 	
@@ -188,10 +185,10 @@ int handle_debugger_commands(State8080* state, char key) {
             printf("Enter number of instructions to execute: ");
 
             do {
-                if (execution_count < 1)
+                if (instruction_count < 1)
                     printf("Negative numbers aren't allowed: ");
-                scanf("%d", &execution_count);
-            } while(execution_count < 1);
+                scanf("%d", &instruction_count);
+            } while(instruction_count < 1);
             
             set_raw_mode(&original);
             return 1;
