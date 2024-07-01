@@ -553,8 +553,8 @@ void emulate_i8080(State8080* state) {
                 state->pc += 2;
             }      
             break;
-        }    
-        case 0xd3: break;    
+        }       
+        case 0xd3: state->pc +=1; break;                // OUT D8
         case 0xd4: {                 // CNC adr
             if (!state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
