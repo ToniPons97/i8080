@@ -7,7 +7,7 @@
 
 #define SCREEN_WIDTH 224
 #define SCREEN_HEIGHT 256
-#define SCALE 3  // Scale factor for better visibility
+#define SCALE 3
 #define VRAM_START 0x2400
 #define VRAM_END 0x3fff
 

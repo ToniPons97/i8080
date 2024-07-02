@@ -21,6 +21,8 @@ uint16_t hex_to_decimal(char* hex_str);
 size_t binary_buffer_size = 0;
 int instruction_count = 1;
 struct termios original;
+SDL_Window* MAIN_WINDOW = NULL;
+SDL_Renderer* MAIN_RENDERER = NULL;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -40,9 +42,8 @@ int main(int argc, char **argv) {
     load_space_invaders_rom(state, &binary_buffer_size);
 
     initialize_sdl();
-    SDL_Window* window = create_window();
-    SDL_Renderer* renderer = create_renderer(window);
-
+    MAIN_WINDOW = create_window();
+    MAIN_RENDERER = create_renderer(MAIN_WINDOW);
 
     int counter = 0;
     while(state->pc < binary_buffer_size) {
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
                 emulate_i8080(state);
-                render_screen(state->memory, renderer);
+                render_screen(state->memory, MAIN_RENDERER);
             }
             
             counter = 0;
@@ -64,7 +65,7 @@ int main(int argc, char **argv) {
     printf("OUT OF LOOP\nProgram counter: 0x%.4x\n\n", state->pc);
     printf("IS STATE NULL? %p\n", state);
 
-    sdl_cleanup(window, renderer);
+    sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
 
     if (state == NULL) {
         free(state);
@@ -140,6 +141,7 @@ void restore_mode(struct termios *original) {
 int handle_debugger_commands(State8080* state, char key) {
     switch (key) {
         case 'q':
+            sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
             restore_mode(&original);
             exit(0);
         case 's':

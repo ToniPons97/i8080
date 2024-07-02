@@ -41,7 +41,7 @@ void render_screen(uint8_t *memory, SDL_Renderer *renderer) {
         
         for (int bit = 0; bit < 8; bit++) {
             if (byte & (1 << bit)) {
-                int x = (addr - 0x2400) % 32 * 8 + bit;
+                int x = ((addr - 0x2400) % 32) * 8 + bit;
                 int y = (addr - 0x2400) / 32;
                 SDL_Rect rect = { x * SCALE, y * SCALE, SCALE, SCALE };
                 SDL_RenderFillRect(renderer, &rect);
