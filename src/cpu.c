@@ -703,84 +703,84 @@ void emulate_i8080(State8080* state) {
         }   
         case 0xef: call(state, 0x28); break;    // RST 5
         case 0xf0: if (!state->cc.z) ret(state); break;    // RP
-    case 0xf1: {                 // POP PSW
-        uint8_t psw = state->memory[state->sp];
-        state->cc.z = (psw & 0x40) != 0;
-        state->cc.s = (psw & 0x80) != 0;
-        state->cc.p = (psw & 0x04) != 0;
-        state->cc.cy = (psw & 0x01) != 0;
-        state->cc.ac = (psw & 0x10) != 0;
-        state->a = state->memory[state->sp + 1];
-        state->sp += 2;
-        break; 
-    }
-    case 0xf2: {                 // JP adr
-        if (state->cc.z) {
-            uint16_t address = (opcode[2] << 8) | opcode[1];
-            state->pc = address;
-        } else {
-            state->pc += 2;
+        case 0xf1: {                 // POP PSW
+            uint8_t psw = state->memory[state->sp];
+            state->cc.z = (psw & 0x40) != 0;
+            state->cc.s = (psw & 0x80) != 0;
+            state->cc.p = (psw & 0x04) != 0;
+            state->cc.cy = (psw & 0x01) != 0;
+            state->cc.ac = (psw & 0x10) != 0;
+            state->a = state->memory[state->sp + 1];
+            state->sp += 2;
+            break; 
         }
-        break; 
-    }   
-    case 0xf3: break;    
-    case 0xf4: {                 // CP adr
-        if (state->cc.p) {
-            uint16_t address = (opcode[2] << 8) | opcode[1];
-            call(state, address);
-        } else {
-            state->pc += 2;
-        }
-        break; 
-    }   
-    case 0xf5: {                 // PUSH PSW
-        uint16_t psw = (state->a << 8) | 
-                        ((state->cc.s & 0x80) |
-                        (state->cc.z & 0x40) |
-                        (state->cc.ac & 0x10) |
-                        (state->cc.p & 0x04) |
-                        (state->cc.cy & 0x01));
+        case 0xf2: {                 // JP adr
+            if (state->cc.z) {
+                uint16_t address = (opcode[2] << 8) | opcode[1];
+                state->pc = address;
+            } else {
+                state->pc += 2;
+            }
+            break; 
+        }   
+        case 0xf3: break;    
+        case 0xf4: {                 // CP adr
+            if (state->cc.p) {
+                uint16_t address = (opcode[2] << 8) | opcode[1];
+                call(state, address);
+            } else {
+                state->pc += 2;
+            }
+            break; 
+        }   
+        case 0xf5: {                 // PUSH PSW
+            uint16_t psw = (state->a << 8) | 
+                            ((state->cc.s & 0x80) |
+                            (state->cc.z & 0x40) |
+                            (state->cc.ac & 0x10) |
+                            (state->cc.p & 0x04) |
+                            (state->cc.cy & 0x01));
 
-        state->memory[state->sp - 1] = (psw >> 8) & 0xff;
-        state->memory[state->sp - 2] = psw & 0xff;
-        state->sp -= 2;
-        break;
-    }
-    case 0xf6: state->a = state->a | opcode[1]; break;    // ORI D8
-    case 0xf7: call(state, 0x30); break;    // RST 6
-    case 0xf8: if (state->cc.s) ret(state); break;    // RM
-    case 0xf9: {                 // SPHL
-        uint16_t address = (state->h << 8) | state->l;
-        state->sp = address;
-        break; 
-    }   
-    case 0xfa: {                 // JM adr
-        if (state->cc.s) {
-            uint16_t address = (opcode[2] << 8) | opcode[1];
-            state->pc = address;
-        } else {
-            state->pc += 2;
+            state->memory[state->sp - 1] = (psw >> 8) & 0xff;
+            state->memory[state->sp - 2] = psw & 0xff;
+            state->sp -= 2;
+            break;
         }
-        break; 
-    }   
-    case 0xfb: break;    
-    case 0xfc: {                 // 	CM adr
-        if (state->cc.s) {
-            uint16_t address = (opcode[2] << 8) | opcode[1];
-            call(state, address);
-        } else {
-            state->pc += 2;
-        }
-        break;
-    }    
-    case 0xfd: break;    
-    case 0xfe: {                 // 	CPI D8
-        cmp(state, opcode[1]);
-        state->pc += 1;
-        break; 
-    }   
-    case 0xff: call(state, 0x38); break;    // 	RST 7
-    }    
+        case 0xf6: state->a = state->a | opcode[1]; break;    // ORI D8
+        case 0xf7: call(state, 0x30); break;    // RST 6
+        case 0xf8: if (state->cc.s) ret(state); break;    // RM
+        case 0xf9: {                 // SPHL
+            uint16_t address = (state->h << 8) | state->l;
+            state->sp = address;
+            break; 
+        }   
+        case 0xfa: {                 // JM adr
+            if (state->cc.s) {
+                uint16_t address = (opcode[2] << 8) | opcode[1];
+                state->pc = address;
+            } else {
+                state->pc += 2;
+            }
+            break; 
+        }   
+        case 0xfb: break;    
+        case 0xfc: {                 // 	CM adr
+            if (state->cc.s) {
+                uint16_t address = (opcode[2] << 8) | opcode[1];
+                call(state, address);
+            } else {
+                state->pc += 2;
+            }
+            break;
+        }    
+        case 0xfd: break;    
+        case 0xfe: {                 // 	CPI D8
+            cmp(state, opcode[1]);
+            state->pc += 1;
+            break; 
+        }   
+        case 0xff: call(state, 0x38); break;    // 	RST 7
+        }    
     state->pc += 1;
 }
 
