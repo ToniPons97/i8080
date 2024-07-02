@@ -28,7 +28,6 @@ int main(int argc, char **argv) {
     if (argc != 2) {
         printf("[!] Binary not provided...\n");
         printf("Example usage: %s space-invaders.bin\n", argv[0]);
-
         return 1;
     }
 
@@ -45,8 +44,13 @@ int main(int argc, char **argv) {
     MAIN_WINDOW = create_window();
     MAIN_RENDERER = create_renderer(MAIN_WINDOW);
 
+    bool quit = false;
+    SDL_Event event;
+
     int counter = 0;
-    while(state->pc < binary_buffer_size) {
+    while (!quit && state->pc < binary_buffer_size) {
+        handle_quit_event(&event, &quit);
+
         read(STDIN_FILENO, &key, 1);
 
         if (handle_debugger_commands(state, key)) {
@@ -57,7 +61,6 @@ int main(int argc, char **argv) {
                 emulate_i8080(state);
                 render_screen(state->memory, MAIN_RENDERER);
             }
-            
             counter = 0;
         }
     }

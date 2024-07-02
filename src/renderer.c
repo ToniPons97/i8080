@@ -27,6 +27,10 @@ SDL_Renderer* create_renderer(SDL_Window* window) {
         exit(1);
     }
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
+
     return renderer;
 }
 
@@ -50,6 +54,14 @@ void render_screen(uint8_t *memory, SDL_Renderer *renderer) {
     }
 
     SDL_RenderPresent(renderer);
+}
+
+void handle_quit_event(SDL_Event* event, bool* quit) {
+    while (SDL_PollEvent(event) != 0) {
+        if (event->type == SDL_QUIT) {
+            *quit = true;
+        }
+    }
 }
 
 void sdl_cleanup(SDL_Window* window, SDL_Renderer* renderer) {

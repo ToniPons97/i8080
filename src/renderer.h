@@ -16,5 +16,6 @@ SDL_Window* create_window();
 SDL_Renderer* create_renderer(SDL_Window* window);
 void render_screen(uint8_t *memory, SDL_Renderer *renderer);
 void sdl_cleanup(SDL_Window* window, SDL_Renderer* renderer);
+void handle_quit_event(SDL_Event* event, bool* quit);
 
 #endif
