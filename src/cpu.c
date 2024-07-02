@@ -23,8 +23,8 @@ void emulate_i8080(State8080* state) {
             break;
         }  
         case 0x02: {                  // STAX B
-            state->b = opcode[1];
-            state->c = opcode[2];
+            uint16_t address = (state->h << 8) | state->l;
+            state->memory[address] = state->a;
             break;
         }   
         case 0x03: {                  // INX B
@@ -60,7 +60,7 @@ void emulate_i8080(State8080* state) {
         case 0x0b: {                  // DCX B
             uint16_t bc = (state->b << 8) | state->c;
             bc -= 1;
-            state->b = (state->b >> 8) & 0xff;
+            state->b = (bc >> 8) & 0xff;
             state->c = bc & 0xff;
             break;    
         }
@@ -135,8 +135,9 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0x1f: {                  // RAR
-            state->cc.cy = state->a & 0x01;
+            uint8_t lsb = state->a & 0x01;
             state->a = (state->a >> 1) | (state->cc.cy << 7);
+            state->cc.cy = lsb;
             break;
         }
         case 0x20: break;    
@@ -147,7 +148,7 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0x22: {                  // SHLD adr
-            uint16_t address = (opcode[1] << 8) | opcode[1];
+            uint16_t address = (opcode[2] << 8) | opcode[1];
             state->memory[address] = state->l;
             state->memory[address + 1] = state->h;
             state->pc += 2;
@@ -181,7 +182,7 @@ void emulate_i8080(State8080* state) {
             state->pc += 2;
             break;
         }    
-        case 0x2b: {                  // CX H
+        case 0x2b: {                  // DCX H
             uint16_t hl = (state->h << 8) | state->l;
             hl -= 1;
             state->h = (hl >> 8) & 0xff;
@@ -356,9 +357,9 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0x76: exit(0); break;   // HLT
-        case 0x77: {                 // MOV M,L
+        case 0x77: {                 // MOV M,A
             uint16_t address = (state->h << 8) | state->l;
-            state->memory[address] = state->l;
+            state->memory[address] = state->a;
             break;
         }    
         case 0x78: state->a = state->b; break;    // MOV A,B
