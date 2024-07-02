@@ -284,7 +284,7 @@ void print_ram(State8080* state) {
     printf("Address    Value\n");
     printf("-------    -----\n");
 
-    int range = 50;
+    int range = 10;
     int start = state->sp - range;
     int end = state->sp + range;
 
@@ -309,12 +309,10 @@ void print_vram(State8080* state) {
     printf("Address    Value\n");
     printf("-------    -----\n");
 
-    for (int i = 0x2400; i < 0x3FFF; i++) {
-        if (i >= 0 && i < 0x10000) {
+    for (int i = 0x2400; i < 0x4000; i++) {
+        if ((i >= 0 && i < 0x10000) && (state->memory[i])) {    
             printf(" ");
             printf("0x%.4x    0x%.2x\n", i, state->memory[i]);
-        } else {
-            printf(" 0x%.4x    ----\n", i);
         }
     }
 

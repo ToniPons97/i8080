@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -lSDL2
 
-main: main.o cpu.o debugger.o
-	$(CC) -o main main.o cpu.o debugger.o $(CFLAGS)
+main: main.o cpu.o debugger.o renderer.o
+	$(CC) -o main main.o cpu.o debugger.o renderer.o $(CFLAGS)
 
-main.o: main.c cpu.h debugger.h
+main.o: main.c cpu.h debugger.h renderer.h
 	$(CC) -c main.c $(CFLAGS)
 
 cpu.o: cpu.c cpu.h
@@ -12,6 +12,9 @@ cpu.o: cpu.c cpu.h
 
 debugger.o: debugger.c debugger.h
 	$(CC) -c debugger.c $(CFLAGS)
+
+renderer.o: renderer.c renderer.h
+	$(CC) -c renderer.c $(CFLAGS)
 
 clean:
 	rm -f main *.o
