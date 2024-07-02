@@ -5,8 +5,8 @@
 #ifndef RENDERER
 #define RENDERER
 
-#define SCREEN_WIDTH 224
-#define SCREEN_HEIGHT 256
+#define SCREEN_WIDTH 556
+#define SCREEN_HEIGHT 224
 #define SCALE 3
 #define VRAM_START 0x2400
 #define VRAM_END 0x3fff
