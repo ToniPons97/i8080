@@ -591,7 +591,7 @@ void emulate_i8080(State8080* state) {
             }
             break; 
         }  
-        case 0xdb: break;    
+        case 0xdb: state->pc += 1; break;               // IN D8    
         case 0xdc: {                 // CC adr
             if (state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
