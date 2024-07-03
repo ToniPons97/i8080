@@ -319,6 +319,73 @@ void print_vram(State8080* state) {
     printf("\n=========================== END OF VRAM ============================\n\n");
 }
 
+void set_raw_mode(struct termios *original) {
+    struct termios raw;
+    tcgetattr(STDIN_FILENO, &raw);
+    *original = raw;
+    raw.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw);
+}
+
+void restore_mode(struct termios *original) {
+    tcsetattr(STDIN_FILENO, TCSANOW, original);
+}
+
+int handle_debugger_commands(State8080* state, char key, unsigned int instruction_count, size_t* buffer_size, struct termios* terminal, SDL_Window* window, SDL_Renderer* renderer) {
+    switch (key) {
+        case 'q':
+            sdl_cleanup(window, renderer);
+            restore_mode(terminal);
+            exit(0);
+        case 's':
+            print_cpu_status(state);
+            return 1;
+        case 'n':
+            printf("[NEXT] ");
+            disassemble(state->memory, state->pc);
+            return 1;
+        case 'm':
+            print_ram(state);
+            return 1;
+        case 'v':
+            print_vram(state);
+            return 1;
+        case 'j':
+            restore_mode(terminal);
+            char new_pc[8];
+            uint16_t decimal_pc;
+
+            printf("Enter new program counter: ");
+            fgets(new_pc, 8, stdin);
+
+            decimal_pc = hex_to_decimal(new_pc);
+
+            printf("New pc: %s", new_pc);
+            *state = jump_to(state, decimal_pc, load_space_invaders_rom, buffer_size);
+            set_raw_mode(terminal);
+            return 1;
+        case 'i':
+            restore_mode(terminal);
+            printf("Enter number of instructions to execute: ");
+
+            do {
+                if (instruction_count < 1)
+                    printf("Negative numbers aren't allowed: ");
+                scanf("%d", &instruction_count);
+            } while(instruction_count < 1);
+            
+            set_raw_mode(terminal);
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+uint16_t hex_to_decimal(char* hex_str) {
+    unsigned long decimal = strtoul(hex_str, NULL, 16);
+    return (uint16_t) decimal;
+}
+
 State8080 jump_to(State8080* state, uint16_t new_pc, void (*load_code)(State8080*, size_t*), size_t* size) {
     if (new_pc >= 0x10000) {  // Assuming maximum address space of 16KB
         printf("Invalid program counter\n");
