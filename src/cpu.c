@@ -549,7 +549,7 @@ void emulate_i8080(State8080* state) {
         case 0xd2: {                 // 	JNC adr
             if (!state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address;
+                state->pc = address - 1;
             } else {
                 state->pc += 2;
             }      
@@ -665,7 +665,7 @@ void emulate_i8080(State8080* state) {
         case 0xea: {                 // JPE adr
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address;
+                state->pc = address - 1;
             } else {
                 state->pc += 2;
             }
@@ -717,7 +717,7 @@ void emulate_i8080(State8080* state) {
         case 0xf2: {                 // JP adr
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address;
+                state->pc = address - 1;
             } else {
                 state->pc += 2;
             }
