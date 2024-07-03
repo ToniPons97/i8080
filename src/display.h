@@ -1,10 +1,10 @@
+#ifndef DISPLAY
+#define DISPLAY
+
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include "common_values.h"
-
-#ifndef DISPLAY
-#define DISPLAY
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 324
