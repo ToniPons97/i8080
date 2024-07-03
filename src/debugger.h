@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "cpu.h"
+#include "common_values.h"
 
 int disassemble(unsigned char *buffer, int pc);
 void print_cpu_status(State8080* state);

@@ -309,8 +309,8 @@ void print_vram(State8080* state) {
     printf("Address    Value\n");
     printf("-------    -----\n");
 
-    for (int i = 0x2400; i < 0x4000; i++) {
-        if ((i >= 0 && i < 0x10000) && (state->memory[i])) {    
+    for (int i = VRAM_START; i <= VRAM_END; i++) {
+        if (state->memory[i]) {
             printf(" ");
             printf("0x%.4x    0x%.2x\n", i, state->memory[i]);
         }
