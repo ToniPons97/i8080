@@ -268,11 +268,11 @@ int disassemble(unsigned char *buffer, int pc) {
 
 void print_cpu_status(State8080* state) {
     printf("\n=========================== START OF CPU STATUS ===========================\n");
-    printf("\nRegisters:\n");
+    printf("\n[Registers]\n\n");
     printf("A:  0x%.2x    B:  0x%.2x    C:  0x%.2x\n", state->a, state->b, state->c);
     printf("D:  0x%.2x    E:  0x%.2x    H:  0x%.2x\n", state->d, state->e, state->h);
     printf("L:  0x%.2x    SP: 0x%.4x\n", state->l, state->sp);
-    printf("\nFlags:\n");
+    printf("\n[Flags]\n\n");
     printf("Z:  0x%.2x    S:  0x%.2x    CY: 0x%.2x\n", state->cc.z, state->cc.s, state->cc.cy);
     printf("AC: 0x%.2x    P:  0x%.2x    PC: ", state->cc.ac, state->cc.p);
     disassemble(state->memory, state->pc);
@@ -331,7 +331,7 @@ void restore_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, original);
 }
 
-int handle_debugger_commands(State8080* state, char key, unsigned int instruction_count, size_t* buffer_size, struct termios* terminal, SDL_Window* window, SDL_Renderer* renderer) {
+int handle_debugger_commands(State8080* state, char key, unsigned int* instruction_count, size_t* buffer_size, struct termios* terminal, SDL_Window* window, SDL_Renderer* renderer) {
     switch (key) {
         case 'q':
             sdl_cleanup(window, renderer);
@@ -371,7 +371,7 @@ int handle_debugger_commands(State8080* state, char key, unsigned int instructio
             do {
                 if (instruction_count < 1)
                     printf("Negative numbers aren't allowed: ");
-                scanf("%d", &instruction_count);
+                scanf("%d", instruction_count);
             } while(instruction_count < 1);
             
             set_raw_mode(terminal);
