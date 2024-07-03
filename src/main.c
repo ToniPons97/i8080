@@ -104,6 +104,8 @@ void run_space_invaders() {
     if (state != NULL) {
         free(state);
     }
+
+    restore_mode(&original);
 }
 
 void run_cpudiag() {
@@ -135,6 +137,8 @@ void run_cpudiag() {
     if (state != NULL) {
         free(state);
     }
+
+    restore_mode(&original);
 }
 
 int handle_program_init(int argc, char** argv) {
