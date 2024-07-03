@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
                 disassemble(state->memory, state->pc);
                 emulate_i8080(state);
                 render_screen(state->memory, MAIN_RENDERER);
+                //SDL_Delay(1000 / 60);
             }
             counter = 0;
         }

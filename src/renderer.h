@@ -1,15 +1,14 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "common_values.h"
 
 #ifndef RENDERER
 #define RENDERER
 
-#define SCREEN_WIDTH 556
-#define SCREEN_HEIGHT 224
+#define SCREEN_WIDTH 256
+#define SCREEN_HEIGHT 324
 #define SCALE 3
-#define VRAM_START 0x2400
-#define VRAM_END 0x3fff
 
 void initialize_sdl();
 SDL_Window* create_window();
