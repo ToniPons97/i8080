@@ -955,7 +955,7 @@ State8080* init_8080_state(void) {
         exit(1);
     }
 
-	state->memory = malloc(0x10000);  //16K
+	state->memory = (uint8_t*) malloc(0x10000);
     if (state->memory == NULL) {
         printf("Error allocating memory for memory buffer.\n");
         exit(1);
