@@ -17,13 +17,15 @@ To get started, compile the source code and run the emulator. The disassembler a
 Use the following command to compile the emulator:
 
 ```bash
-gcc -c main.c -Wall
-gcc -c cpu.c -Wall
-gcc -c debugger.c -Wall
-gcc -o main main.o cpu.o debugger.o -Wall
+gcc -c main.c -Wall -lSDL2
+gcc -c cpu.c -Wall -lSDL2
+gcc -c display.c -Wall -lSDL2
+gcc -c file_handler.c -Wall -lSDL2
+gcc -o main main.o cpu.o debugger.o display.o file_handler.o -Wall -lSDL2
 ```
 
 Using make:
 ```bash
+cd src
 make
 ```
