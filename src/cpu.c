@@ -513,8 +513,6 @@ void emulate_i8080(State8080* state) {
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 state->pc = address - 1;
-
-                printf("JUMPING TO 0x%.4x\n", address);
             } else {
                 state->pc += 2;
             }
