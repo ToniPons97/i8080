@@ -369,10 +369,10 @@ int handle_debugger_commands(State8080* state, char key, unsigned int* instructi
             printf("Enter number of instructions to execute: ");
 
             do {
-                if (instruction_count < 1)
+                if (*instruction_count < 1)
                     printf("Negative numbers aren't allowed: ");
                 scanf("%d", instruction_count);
-            } while(instruction_count < 1);
+            } while(*instruction_count < 1);
             
             set_raw_mode(terminal);
             return 1;
