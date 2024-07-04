@@ -519,11 +519,16 @@ void emulate_i8080(State8080* state) {
         case 0xc8:{             // RZ
             if (state->cc.z) {
                 ret(state);
+                state->pc += 2;
             }
 
             break;
         }    
-        case 0xc9: ret(state); return;    // RET
+        case 0xc9: {
+            ret(state);
+            state->pc += 2;
+            break;
+        }    
         case 0xca: {                 // JZ adr
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -564,7 +569,7 @@ void emulate_i8080(State8080* state) {
         case 0xd0: {
             if (!state->cc.cy) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -609,7 +614,7 @@ void emulate_i8080(State8080* state) {
         case 0xd8: {
             if (state->cc.cy) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -652,7 +657,7 @@ void emulate_i8080(State8080* state) {
         case 0xe0:{ 
             if (!state->cc.p) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -703,7 +708,7 @@ void emulate_i8080(State8080* state) {
         case 0xe8: {                // RPE
             if (state->cc.p) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -758,7 +763,7 @@ void emulate_i8080(State8080* state) {
         case 0xf0: {                // RP
             if (state->cc.p) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -822,7 +827,7 @@ void emulate_i8080(State8080* state) {
         case 0xf8: {                // RM
             if (state->cc.s) {
                 ret(state); 
-                return;
+                state->pc += 2;
             }
 
             break;
@@ -879,8 +884,10 @@ void ret(State8080* state) {
     uint8_t pc_lo = state->memory[state->sp];
     uint8_t pc_hi = state->memory[state->sp + 1];
 
+    /*
     printf("PC_LO: %.2x\n", pc_lo);
     printf("PC_HI: %.2x\n", pc_hi);
+    */
 
     state->pc = (pc_hi << 8) | pc_lo;
 
