@@ -14,7 +14,7 @@ debugger.o: debugger.c debugger.h
 	$(CC) -c debugger.c $(CFLAGS)
 
 display.o: display.c display.h
-	$(CC) -c display.c $(CFLAGS)
+	$(CC) -c display.c $(CFLAGS) 
 
 file_handler.o: file_handler.c file_handler.h
 	$(CC) -c file_handler.c $(CFLAGS)
