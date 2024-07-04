@@ -475,7 +475,8 @@ void emulate_i8080(State8080* state) {
         case 0xc2: {                 // JNZ adr
             if (!state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address - 1;
+                state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -483,13 +484,14 @@ void emulate_i8080(State8080* state) {
         }   
         case 0xc3: {                  // JMP adr
             uint16_t address = (opcode[2] << 8) | opcode[1];
-            state->pc = address - 1;
-            break;
+            state->pc = address;
+            return;
         }    
         case 0xc4: {                  // CNZ adr
             if (!state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -501,18 +503,24 @@ void emulate_i8080(State8080* state) {
             state->cc.z = (result & 0xff) == 0;
             state->cc.s = (result & 0x80) != 0;
             state->cc.cy = result > 0xff;
-            state->cc.p = parity(result & 0xff);
+            state->cc.p = parity((uint8_t) result);
             state->a = result & 0xff;
             state->pc += 1;
             break; 
         }
-        case 0xc7: call(state, 0x00); break;    // 	RST 0
-        case 0xc8: if (state->cc.z) ret(state); break;    // RZ
+        case 0xc7: call(state, 0x00); return;    // 	RST 0
+        case 0xc8:{             // RZ
+            if (state->cc.z) {
+                ret(state);
+            }
+            break;
+        }    
         case 0xc9: ret(state); break;    // RET
         case 0xca: {                 // JZ adr
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address - 1;
+                state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -523,6 +531,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -531,7 +540,7 @@ void emulate_i8080(State8080* state) {
         case 0xcd: {                  // CALL adr
             uint16_t address = (opcode[2] << 8) | opcode[1];
             call(state, address);
-            break;
+            return;
         }
         case 0xce: {                 // ACI D8
             uint16_t result = (uint16_t) state->a + (uint16_t) opcode[1] + (uint16_t) state->cc.cy;
@@ -543,13 +552,14 @@ void emulate_i8080(State8080* state) {
             state->a = result & 0xff;
             break;  
         }  
-        case 0xcf: call(state, 0x8); break;    // RST 1
+        case 0xcf: call(state, 0x8); return;    // RST 1
         case 0xd0: if (!state->cc.cy) ret(state); break;    // RNC
         case 0xd1: pop(state, &state->d, &state->e); break;    // POP D
         case 0xd2: {                 // 	JNC adr
             if (!state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address - 1;
+                state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }      
@@ -560,6 +570,7 @@ void emulate_i8080(State8080* state) {
             if (!state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -579,13 +590,14 @@ void emulate_i8080(State8080* state) {
             state->pc += 1;
             break;
         }
-        case 0xd7: call(state, 0x10); break;    // RST 2
+        case 0xd7: call(state, 0x10); return;    // RST 2
         case 0xd8: if (state->cc.cy) ret(state); break;    // RC
         case 0xd9: break;    
         case 0xda: {                 // JC adr
             if (state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -596,6 +608,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -613,13 +626,14 @@ void emulate_i8080(State8080* state) {
             state->pc += 1;
             break;
         }
-        case 0xdf: call(state, 0x18); break;    // RST 3
+        case 0xdf: call(state, 0x18); return;    // RST 3
         case 0xe0: if (!state->cc.p) ret(state); break;    // RPO
         case 0xe1: pop(state, &state->h, &state->l); break;    // POP H
         case 0xe2: {                 // JPO adr
             if(!state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -639,6 +653,7 @@ void emulate_i8080(State8080* state) {
             if (!state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -655,7 +670,7 @@ void emulate_i8080(State8080* state) {
             state->pc += 1;
             break;
         }
-        case 0xe7: call(state, 0x20); break;    
+        case 0xe7: call(state, 0x20); return;    
         case 0xe8: if (state->cc.p) ret(state); break;    // RPE
         case 0xe9: {                 // PCHL
             uint16_t hl = (state->h << 8) | state->l;
@@ -665,7 +680,8 @@ void emulate_i8080(State8080* state) {
         case 0xea: {                 // JPE adr
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address - 1;
+                state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -685,6 +701,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -695,14 +712,14 @@ void emulate_i8080(State8080* state) {
             uint8_t result = state->a ^ opcode[1];
             state->cc.z = result == 0;
             state->cc.s = (result & 0x80) != 0;
-            state->cc.cy = 0; 
+            state->cc.cy = 0;
             state->cc.p = parity(result);
             state->a = result;
-            state->pc += 2;
+            state->pc += 1;
             break; 
         }   
-        case 0xef: call(state, 0x28); break;    // RST 5
-        case 0xf0: if (!state->cc.z) ret(state); break;    // RP
+        case 0xef: call(state, 0x28); return;    // RST 5
+        case 0xf0: if (state->cc.p) ret(state); break;    // RP
         case 0xf1: {                 // POP PSW
             uint8_t psw = state->memory[state->sp];
             state->cc.z = (psw & 0x40) != 0;
@@ -715,9 +732,10 @@ void emulate_i8080(State8080* state) {
             break; 
         }
         case 0xf2: {                 // JP adr
-            if (state->cc.z) {
+            if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
-                state->pc = address - 1;
+                state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -728,6 +746,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -746,8 +765,17 @@ void emulate_i8080(State8080* state) {
             state->sp -= 2;
             break;
         }
-        case 0xf6: state->a = state->a | opcode[1]; break;    // ORI D8
-        case 0xf7: call(state, 0x30); break;    // RST 6
+        case 0xf6: {                // // ORI D8
+            uint8_t result = state->a | (uint8_t) opcode[1];
+            state->a = result;
+            state->cc.z = result == 0;
+            state->cc.s = (result & 0x80) != 0;
+            state->cc.p = parity(result);
+            state->cc.ac = (result & 0x0F) == 0x00; 
+            state->pc += 1;
+            break; 
+        }    
+        case 0xf7: call(state, 0x30); return;    // RST 6
         case 0xf8: if (state->cc.s) ret(state); break;    // RM
         case 0xf9: {                 // SPHL
             uint16_t address = (state->h << 8) | state->l;
@@ -758,6 +786,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.s) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 state->pc = address;
+                return;
             } else {
                 state->pc += 2;
             }
@@ -768,6 +797,7 @@ void emulate_i8080(State8080* state) {
             if (state->cc.s) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
                 call(state, address);
+                return;
             } else {
                 state->pc += 2;
             }
@@ -779,8 +809,9 @@ void emulate_i8080(State8080* state) {
             state->pc += 1;
             break; 
         }   
-        case 0xff: call(state, 0x38); break;    // 	RST 7
-        }    
+        case 0xff: call(state, 0x38); return;    // 	RST 7
+    } 
+
     state->pc += 1;
 }
 
@@ -791,14 +822,20 @@ void call(State8080* state, uint16_t address) {
     state->memory[state->sp - 1] = pc_hi;
     state->memory[state->sp - 2] = pc_lo;
     state->sp -= 2;
-    state->pc = address - 1;
+    state->pc = address;
 }
 
 void ret(State8080* state) {
     uint8_t pc_lo = state->memory[state->sp];
     uint8_t pc_hi = state->memory[state->sp + 1];
 
+    printf("PC_LO: %.2x\n", pc_lo);
+    printf("PC_HI: %.2x\n", pc_hi);
+
     state->pc = (pc_hi << 8) | pc_lo;
+
+    printf("PC: %.4x\n", state->pc);
+
     state->sp += 2;
 }
 
