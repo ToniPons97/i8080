@@ -120,6 +120,7 @@ void run_cpudiag() {
     int counter = 0;
 
     read_file_at_offset(state, "cpudiag", 0x100, &buffer_size);
+    state->memory[368] = 0x7; 
 
     while (state->pc < buffer_size) {
         read(STDIN_FILENO, &key, 1);
