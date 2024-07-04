@@ -470,7 +470,14 @@ void emulate_i8080(State8080* state) {
             break;
         }    
         case 0xbf: cmp(state, state->a); break;    // CMP A
-        case 0xc0: if (!state->cc.z) ret(state); break;   // RNZ
+        case 0xc0: {
+            if (!state->cc.z) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }   
         case 0xc1: pop(state, &state->b, &state->c); break;    // POP B
         case 0xc2: {                 // JNZ adr
             if (!state->cc.z) {
@@ -513,9 +520,10 @@ void emulate_i8080(State8080* state) {
             if (state->cc.z) {
                 ret(state);
             }
+
             break;
         }    
-        case 0xc9: ret(state); break;    // RET
+        case 0xc9: ret(state); return;    // RET
         case 0xca: {                 // JZ adr
             if (state->cc.z) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -553,7 +561,14 @@ void emulate_i8080(State8080* state) {
             break;  
         }  
         case 0xcf: call(state, 0x8); return;    // RST 1
-        case 0xd0: if (!state->cc.cy) ret(state); break;    // RNC
+        case 0xd0: {
+            if (!state->cc.cy) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }    
         case 0xd1: pop(state, &state->d, &state->e); break;    // POP D
         case 0xd2: {                 // 	JNC adr
             if (!state->cc.cy) {
@@ -591,7 +606,14 @@ void emulate_i8080(State8080* state) {
             break;
         }
         case 0xd7: call(state, 0x10); return;    // RST 2
-        case 0xd8: if (state->cc.cy) ret(state); break;    // RC
+        case 0xd8: {
+            if (state->cc.cy) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }   
         case 0xd9: break;    
         case 0xda: {                 // JC adr
             if (state->cc.cy) {
@@ -627,7 +649,14 @@ void emulate_i8080(State8080* state) {
             break;
         }
         case 0xdf: call(state, 0x18); return;    // RST 3
-        case 0xe0: if (!state->cc.p) ret(state); break;    // RPO
+        case 0xe0:{ 
+            if (!state->cc.p) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }   
         case 0xe1: pop(state, &state->h, &state->l); break;    // POP H
         case 0xe2: {                 // JPO adr
             if(!state->cc.p) {
@@ -670,8 +699,15 @@ void emulate_i8080(State8080* state) {
             state->pc += 1;
             break;
         }
-        case 0xe7: call(state, 0x20); return;    
-        case 0xe8: if (state->cc.p) ret(state); break;    // RPE
+        case 0xe7: call(state, 0x20); return;               // 	RST 4
+        case 0xe8: {                // RPE
+            if (state->cc.p) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }     
         case 0xe9: {                 // PCHL
             uint16_t hl = (state->h << 8) | state->l;
             state->pc = hl;
@@ -719,7 +755,14 @@ void emulate_i8080(State8080* state) {
             break; 
         }   
         case 0xef: call(state, 0x28); return;    // RST 5
-        case 0xf0: if (state->cc.p) ret(state); break;    // RP
+        case 0xf0: {                // RP
+            if (state->cc.p) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }    
         case 0xf1: {                 // POP PSW
             uint8_t psw = state->memory[state->sp];
             state->cc.z = (psw & 0x40) != 0;
@@ -776,7 +819,14 @@ void emulate_i8080(State8080* state) {
             break; 
         }    
         case 0xf7: call(state, 0x30); return;    // RST 6
-        case 0xf8: if (state->cc.s) ret(state); break;    // RM
+        case 0xf8: {                // RM
+            if (state->cc.s) {
+                ret(state); 
+                return;
+            }
+
+            break;
+        }   
         case 0xf9: {                 // SPHL
             uint16_t address = (state->h << 8) | state->l;
             state->sp = address;
