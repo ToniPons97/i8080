@@ -65,6 +65,7 @@ void debug_space_invaders() {
                 emulate_i8080(state);
                 render_screen(state->memory, MAIN_RENDERER);
             }
+
             counter = 0;
         }
     }
@@ -113,6 +114,7 @@ void run_cpudiag() {
 
     State8080* state = init_8080_state();
     state->pc = 0x100;
+
     size_t buffer_size = 0;
     char key = '\0';
     int counter = 0;
@@ -122,14 +124,14 @@ void run_cpudiag() {
     while (state->pc < buffer_size) {
         read(STDIN_FILENO, &key, 1);
 
-        if (handle_debugger_commands(state, key, &instruction_count, &rom_buffer_size, &original, MAIN_WINDOW, MAIN_RENDERER)) {
+        if (handle_debugger_commands(state, key, &instruction_count, &buffer_size, &original, MAIN_WINDOW, MAIN_RENDERER)) {
             counter = instruction_count;
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
                 emulate_i8080(state);
             }
-            
+
             counter = 0;
         }
     }
