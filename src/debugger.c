@@ -288,21 +288,21 @@ void print_ram(State8080* state) {
     int start = state->sp - range;
     int end = state->sp + range;
 
-    for (int i = start; i <= end; i++) {
-        if (i >= 0 && i < 0x10000) {
-            if (i == state->sp)
-                printf("*");
-            else
-                printf(" ");
+    if (start < 0) start = 0;
+    if (end >= 0x10000) end = 0xFFFF;
 
-            printf("0x%.4x    0x%.2x\n", i, state->memory[i]);
-        } else {
-            printf(" 0x%.4x    ----\n", i);
-        }
+    for (int i = start; i <= end; i++) {
+        if (i == state->sp)
+            printf("*");
+        else
+            printf(" ");
+
+        printf("0x%.4x    0x%.2x\n", i, state->memory[i]);
     }
 
     printf("\n=========================== END OF RAM ============================\n\n");
 }
+
 
 void print_vram(State8080* state) {
     printf("\n=========================== START OF VRAM ===========================\n\n");
