@@ -331,25 +331,30 @@ void restore_mode(struct termios *original) {
     tcsetattr(STDIN_FILENO, TCSANOW, original);
 }
 
-int handle_debugger_commands(State8080* state, char key, unsigned int* instruction_count, size_t* buffer_size, struct termios* terminal, SDL_Window* window, SDL_Renderer* renderer) {
+bool handle_debugger_commands(State8080* state, char key, unsigned int* instruction_count, size_t* buffer_size, struct termios* terminal, SDL_Window* window, SDL_Renderer* renderer) {
     switch (key) {
         case 'q':
             sdl_cleanup(window, renderer);
             restore_mode(terminal);
+
+            if (state != NULL) {
+                free(state);
+            }
+
             exit(0);
         case 's':
             print_cpu_status(state);
-            return 1;
+            return true;
         case 'n':
             printf("[NEXT] ");
             disassemble(state->memory, state->pc);
-            return 1;
+            return true;
         case 'm':
             print_ram(state);
-            return 1;
+            return true;
         case 'v':
             print_vram(state);
-            return 1;
+            return true;
         case 'j':
             restore_mode(terminal);
             char new_pc[8];
@@ -363,7 +368,7 @@ int handle_debugger_commands(State8080* state, char key, unsigned int* instructi
             printf("New pc: %s", new_pc);
             *state = jump_to(state, decimal_pc, load_space_invaders_rom, buffer_size);
             set_raw_mode(terminal);
-            return 1;
+            return true;
         case 'i':
             restore_mode(terminal);
             printf("Enter number of instructions to execute: ");
@@ -375,9 +380,9 @@ int handle_debugger_commands(State8080* state, char key, unsigned int* instructi
             } while(*instruction_count < 1);
             
             set_raw_mode(terminal);
-            return 1;
+            return true;
         default:
-            return 0;
+            return false;
     }
 }
 
