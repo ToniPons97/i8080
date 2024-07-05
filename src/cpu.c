@@ -399,7 +399,7 @@ bool emulate_i8080(State8080* state) {
         case 0x90: subtract_to_accumulator(state, state->b); break;    // SUB B
         case 0x91: subtract_to_accumulator(state, state->c); break;    // SUB C
         case 0x92: subtract_to_accumulator(state, state->d); break;    // SUB D
-        case 0x93: subtract_to_accumulator(state, state->d); break;    // SUB E
+        case 0x93: subtract_to_accumulator(state, state->e); break;    // SUB E
         case 0x94: subtract_to_accumulator(state, state->h); break;    // SUB H
         case 0x95: subtract_to_accumulator(state, state->l); break;    // SUB L
         case 0x96: {                 // SUB M
@@ -945,7 +945,7 @@ void sbb(State8080* state, uint8_t num) {
     
     state->cc.z = ((result & 0xff) == 0);
     state->cc.s = ((result & 0x80) != 0);
-    state->cc.cy = (state->a < num + state->cc.cy);;
+    state->cc.cy = (state->a < num + state->cc.cy);
     state->cc.p = parity(result & 0xff);
     
     state->a = result & 0xff;
@@ -1044,7 +1044,7 @@ State8080* init_8080_state(void) {
         exit(1);
     }
 
-    memset(state->memory, 0x90, 0x1000);
+    memset(state->memory, 0x0, 0x1000);
 
 	return state;
 }
