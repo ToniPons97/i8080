@@ -8,7 +8,7 @@
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 324
-#define SCALE 3
+#define SCALE 2
 
 void initialize_sdl();
 SDL_Window* create_window();

@@ -39,7 +39,7 @@ void render_screen(uint8_t *memory, SDL_Renderer *renderer) {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    for (int addr = VRAM_START; addr <= VRAM_END; addr++) {
+    for (int addr = VRAM_END; addr >= VRAM_START; addr--) {
         uint8_t byte = memory[addr];
         
         for (int bit = 0; bit < 8; bit++) {
