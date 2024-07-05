@@ -105,8 +105,6 @@ void run_space_invaders() {
     if (state != NULL) {
         free(state);
     }
-
-    restore_mode(&original);
 }
 
 void run_cpudiag() {
