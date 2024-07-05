@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 #ifndef CPU
 #define CPU
@@ -32,7 +33,7 @@ typedef struct State8080 {
 } State8080;
 
 void unimplemented_instruction(State8080* state);
-void emulate_i8080(State8080* state);
+bool emulate_i8080(State8080* state);
 void call(State8080* state, uint16_t address);
 void ret(State8080* state);
 void push(State8080* state, uint8_t reg_hi, uint8_t reg_lo);
