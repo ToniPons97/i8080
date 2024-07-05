@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
             break;
 
         default:
-            printf("Running CPUDIAG\n");
+            printf("Running CPUDIAG\n\n");
             run_cpudiag();
             return 1;
     }
@@ -113,16 +113,19 @@ void run_cpudiag() {
     set_raw_mode(&original);
 
     State8080* state = init_8080_state();
-    state->pc = 0x100;
 
+    bool should_exit = false;
     size_t buffer_size = 0;
     char key = '\0';
     int counter = 0;
 
-    read_file_at_offset(state, "cpudiag", 0x100, &buffer_size);
+    read_file_at_offset(state, "./cpudiag", 0x100, &buffer_size);
+    printf("Buffer size: %ld\n", buffer_size);
+    
+    state->pc = 0x100;
     state->memory[368] = 0x7; 
 
-    while (state->pc < buffer_size) {
+    while ((state->pc < buffer_size) && !should_exit) {
         read(STDIN_FILENO, &key, 1);
 
         if (handle_debugger_commands(state, key, &instruction_count, &buffer_size, &original, MAIN_WINDOW, MAIN_RENDERER)) {
@@ -130,7 +133,7 @@ void run_cpudiag() {
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
-                emulate_i8080(state);
+                should_exit = emulate_i8080(state);
             }
 
             counter = 0;
