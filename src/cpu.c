@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "cpu.h"
 
 // https://altairclone.com/downloads/manuals/8080%20Programmers%20Manual.pdf
@@ -356,7 +354,7 @@ void emulate_i8080(State8080* state) {
             state->memory[address] = state->l;
             break;
         }    
-        case 0x76: exit(0); break;   // HLT
+        case 0x76: printf("HTL\n"); break;   // HLT
         case 0x77: {                 // MOV M,A
             uint16_t address = (state->h << 8) | state->l;
             state->memory[address] = state->a;
@@ -1050,10 +1048,13 @@ State8080* init_8080_state(void) {
     }
 
 	state->memory = (uint8_t*) malloc(0x10000);
+
     if (state->memory == NULL) {
         printf("Error allocating memory for memory buffer.\n");
         exit(1);
     }
+
+    memset(state->memory, 0x90, 0x1000);
 
 	return state;
 }
