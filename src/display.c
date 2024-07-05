@@ -39,17 +39,19 @@ void render_screen(uint8_t *memory, SDL_Renderer *renderer) {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    for (int addr = VRAM_END; addr >= VRAM_START; addr--) {
+    for (int addr = VRAM_START; addr <= VRAM_END; addr++) {
         uint8_t byte = memory[addr];
         
         for (int bit = 0; bit < 8; bit++) {
             if (byte & (1 << bit)) {
-                int y = ((addr - VRAM_START) * 8 + bit) % 256;
-                int x = ((addr - VRAM_START) * 8 + bit) / 256;
+                int y = ((addr - VRAM_START) * 8 + bit) / 256;
+                int x = ((addr - VRAM_START) * 8 + bit) % 256;
+                
+                // Adjust for -90 degree rotation
+                int rotated_x = y * SCALE;  // Swap x and y
+                int rotated_y = (255 - x) * SCALE;  // Flip y-axis
 
-                printf("[Rendering pixel at: (%d, %d), addr: 0x%x, byte: 0x%x, bit: %d]\n", x, y, addr, byte, bit);
-
-                SDL_Rect rect = { x * SCALE, y * SCALE, SCALE, SCALE };
+                SDL_Rect rect = { rotated_x, rotated_y, SCALE, SCALE };
                 SDL_RenderFillRect(renderer, &rect);
             }
         }
