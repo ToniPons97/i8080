@@ -9,7 +9,7 @@ void unimplemented_instruction(State8080* state) {
     exit(1);    
 }
 
-bool emulate_i8080(State8080* state) {    
+bool emulate_i8080(State8080* state, IOInterface* io) {    
     unsigned char *opcode = &state->memory[state->pc];    
 
     switch(*opcode) {    
@@ -579,7 +579,16 @@ bool emulate_i8080(State8080* state) {
             }      
             break;
         }       
-        case 0xd3: state->pc +=1; break;                // OUT D8
+        case 0xd3: {                // OUT D8
+            if (io == NULL) {
+                state->pc += 2;
+                return false;
+            }
+
+            io->machine_out(state, opcode[1]);
+            state->pc +=1; 
+            break;
+        }               
         case 0xd4: {                 // CNC adr
             if (!state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -624,7 +633,16 @@ bool emulate_i8080(State8080* state) {
             }
             break; 
         }  
-        case 0xdb: state->pc += 1; break;               // IN D8    
+        case 0xdb: {                // IN D8
+            if (io == NULL) {
+                state->pc += 2;
+                return false;
+            }
+            
+            state->a = io->machine_in(state, opcode[1]);
+            state->pc += 1; 
+            break; 
+        }
         case 0xdc: {                 // CC adr
             if (state->cc.cy) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
