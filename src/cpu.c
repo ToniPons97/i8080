@@ -9,7 +9,7 @@ void unimplemented_instruction(State8080* state) {
     exit(1);    
 }
 
-bool emulate_i8080(State8080* state, IOInterface* io) {    
+bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_state) {    
     unsigned char *opcode = &state->memory[state->pc];    
 
     switch(*opcode) {    
@@ -638,8 +638,8 @@ bool emulate_i8080(State8080* state, IOInterface* io) {
                 state->pc += 2;
                 return false;
             }
-            
-            state->a = io->machine_in(state, opcode[1]);
+
+            state->a = io->machine_in(state, opcode[1], keyboard_state);
             state->pc += 1; 
             break; 
         }

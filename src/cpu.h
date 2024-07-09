@@ -9,7 +9,7 @@
 #include "io_interface.h"
 
 void unimplemented_instruction(State8080* state);
-bool emulate_i8080(State8080* state, IOInterface* io);
+bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_state);
 void call(State8080* state, uint16_t address);
 void ret(State8080* state);
 void push(State8080* state, uint8_t reg_hi, uint8_t reg_lo);

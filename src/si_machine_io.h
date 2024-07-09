@@ -2,8 +2,9 @@
 #define SI_MACHINE_IO
 
 #include "state8080.h"
+#include "keyboard_state.h"
 
-uint8_t si_machine_in(State8080* state, uint8_t port) {
+uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_state) {
     uint8_t input_port = 0;
     switch (port) {
         case 0:
@@ -46,6 +47,12 @@ uint8_t si_machine_in(State8080* state, uint8_t port) {
                 bit 5 = 1P left (1 if pressed)
                 bit 6 = 1P right (1 if pressed)
             */
+
+            if (get_key_state(keyboard_state, 'c')) {
+                input_port |= (1 << 0);
+            } else {
+                input_port &= ~(1 << 0);
+            }
             
             // bit 3 = Always 1
             input_port |= (1 << 3);

@@ -63,7 +63,7 @@ void debug_space_invaders() {
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
-                emulate_i8080(state, NULL);
+                emulate_i8080(state, NULL, NULL);
                 render_screen(state->memory, MAIN_RENDERER);
             }
 
@@ -104,7 +104,7 @@ void run_space_invaders() {
 
     while (!quit && state->pc < rom_buffer_size) {
         handle_sdl_events(&key_state, &event, &quit);
-        emulate_i8080(state, &io);
+        emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
         //SDL_Delay(1000 / 60);
         printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
@@ -141,7 +141,7 @@ void run_cpudiag() {
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
-                should_exit = emulate_i8080(state, NULL);
+                should_exit = emulate_i8080(state, NULL, NULL);
             }
 
             counter = 0;
