@@ -22,7 +22,8 @@ gcc -c cpu.c -Wall -lSDL2
 gcc -c debugger.c -Wall -lSDL2
 gcc -c display.c -Wall -lSDL2
 gcc -c file_handler.c -Wall -lSDL2
-gcc -o main main.o cpu.o debugger.o display.o file_handler.o -Wall -lSDL2
+gcc -c keyboard_state.c -Wall -lSDL2
+gcc -o main main.o cpu.o debugger.o display.o file_handler.o keyboard_state.o -Wall -lSDL2
 ```
 
 Using make:
