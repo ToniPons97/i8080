@@ -3,6 +3,7 @@
 #include "cpu.h"
 #include "debugger.h"
 #include "display.h"
+#include "si_machine_io.h"
 
 void print_banner(void);
 int handle_program_init(int argc, char** argv);
@@ -62,7 +63,7 @@ void debug_space_invaders() {
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
-                emulate_i8080(state);
+                emulate_i8080(state, NULL);
                 render_screen(state->memory, MAIN_RENDERER);
             }
 
@@ -86,6 +87,14 @@ void run_space_invaders() {
     State8080* state = init_8080_state();
     load_space_invaders_rom(state, &rom_buffer_size);
 
+    IOInterface io = {
+        .machine_in = si_machine_in,
+        .machine_out = si_machine_out
+    };
+
+    KeyboardMap key_state;
+    init_keyboard_state(&key_state);
+
     initialize_sdl();
     MAIN_WINDOW = create_window();
     MAIN_RENDERER = create_renderer(MAIN_WINDOW);
@@ -94,10 +103,11 @@ void run_space_invaders() {
     SDL_Event event;
 
     while (!quit && state->pc < rom_buffer_size) {
-        handle_quit_event(&event, &quit);
-        emulate_i8080(state);
+        handle_sdl_events(&key_state, &event, &quit);
+        emulate_i8080(state, &io);
         render_screen(state->memory, MAIN_RENDERER);
         //SDL_Delay(1000 / 60);
+        printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
@@ -131,7 +141,7 @@ void run_cpudiag() {
         } else {
             while (counter++ < instruction_count) {
                 disassemble(state->memory, state->pc);
-                should_exit = emulate_i8080(state);
+                should_exit = emulate_i8080(state, NULL);
             }
 
             counter = 0;
