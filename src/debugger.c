@@ -402,7 +402,7 @@ State8080 jump_to(State8080* state, uint16_t new_pc, void (*load_code)(State8080
     load_code(new_state, size);
 
     while (new_state->pc != new_pc) {
-        emulate_i8080(new_state);
+        emulate_i8080(new_state, NULL);
     }
 
     return *new_state;

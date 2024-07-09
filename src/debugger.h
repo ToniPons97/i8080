@@ -1,10 +1,10 @@
-#ifndef DEBUGGER
-#define DEBUGGER
+#ifndef DEBUGGER_H
+#define DEBUGGER_H
 
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
-#include "cpu.h"
+#include "state8080.h"
 #include "file_handler.h"
 #include "display.h"
 
