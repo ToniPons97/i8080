@@ -68,6 +68,36 @@ void handle_quit_event(SDL_Event* event, bool* quit) {
     }
 }
 
+void handle_sdl_events(KeyboardMap* keyboard_state, SDL_Event* event, bool* quit) {
+    while (SDL_PollEvent(event) != 0) {
+        if (event->type == SDL_QUIT) {
+            *quit = true;
+        }
+
+        if (keyboard_state != NULL) {
+            handle_keyboard_events(keyboard_state, event);
+        }
+    }
+}
+
+void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
+    if (event->type == SDL_KEYDOWN) {
+        // c
+        if (event->key.keysym.sym == SDLK_c) {
+            char key = event->key.keysym.sym;
+            set_key_state(keyboard_state, key, true);
+        }
+    }
+
+    if (event->type == SDL_KEYUP) {
+        // c
+        if (event->key.keysym.sym == SDLK_c) {
+            char key = event->key.keysym.sym;
+            set_key_state(keyboard_state, key, false);
+        }
+    }
+}
+
 void sdl_cleanup(SDL_Window* window, SDL_Renderer* renderer) {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
