@@ -80,20 +80,24 @@ void handle_sdl_events(KeyboardMap* keyboard_state, SDL_Event* event, bool* quit
     }
 }
 
+// SPACE (fire) | a (left) | d (right) |  c (coin insertion)
 void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
+    SDL_KeyCode keycode = event->key.keysym.sym;
     if (event->type == SDL_KEYDOWN) {
-        // c
-        if (event->key.keysym.sym == SDLK_c) {
-            char key = event->key.keysym.sym;
-            set_key_state(keyboard_state, key, true);
+        if (keycode == SDLK_SPACE || 
+            keycode == SDLK_a || 
+            keycode == SDLK_d || 
+            keycode == SDLK_c) {
+            set_key_state(keyboard_state, keycode, true);
         }
     }
 
     if (event->type == SDL_KEYUP) {
-        // c
-        if (event->key.keysym.sym == SDLK_c) {
-            char key = event->key.keysym.sym;
-            set_key_state(keyboard_state, key, false);
+        if (keycode == SDLK_SPACE || 
+            keycode == SDLK_a || 
+            keycode == SDLK_d || 
+            keycode == SDLK_c) {
+            set_key_state(keyboard_state, keycode, false);
         }
     }
 }

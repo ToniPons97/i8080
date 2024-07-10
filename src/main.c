@@ -107,7 +107,12 @@ void run_space_invaders() {
         emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
         //SDL_Delay(1000 / 60);
-        printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
+        /*
+            printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
+            printf("SPACE pressed? %d\n", get_key_state(&key_state, ' '));
+            printf("LEFT pressed? %d\n", get_key_state(&key_state, 'a'));
+            printf("RIGHT pressed? %d\n", get_key_state(&key_state, 'd'));
+        */
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
