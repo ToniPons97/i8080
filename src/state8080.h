@@ -37,7 +37,7 @@ typedef struct State8080 {
 
     struct ConditionCodes  cc;    
     bool     int_enable;
-    uint64_t cycles;
+    uint64_t t_states;
 
     // Space Invaders Dedicated Shift Hardware
     ExternalDevices external_devices;
