@@ -276,6 +276,7 @@ void print_cpu_status(State8080* state) {
     printf("Z:  0x%.2x    S:  0x%.2x    CY: 0x%.2x\n", state->cc.z, state->cc.s, state->cc.cy);
     printf("AC: 0x%.2x    P:  0x%.2x    PC: ", state->cc.ac, state->cc.p);
     disassemble(state->memory, state->pc);
+    printf("\n Cycles: %ld\n", state->cycles);
     printf("\n=========================== END OF CPU STATUS ============================\n\n");
 }
 
