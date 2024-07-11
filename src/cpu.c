@@ -24,6 +24,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
         case 0x02: {                  // STAX B
             uint16_t address = (state->h << 8) | state->l;
             state->memory[address] = state->a;
+            state->cycles += 2;
             break;
         }   
         case 0x03: {                  // INX B
@@ -95,6 +96,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
         case 0x12: {                  // STAX D
             uint16_t address = (state->d << 8) | state->e;
             state->memory[address] = state->a;
+            state->cycles += 2;
             break;
         }
         case 0x13: {                  // INX D
