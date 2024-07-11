@@ -2,6 +2,7 @@
 #define STATE_8080_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct ConditionCodes {    
     uint8_t    z:1;    
@@ -35,8 +36,7 @@ typedef struct State8080 {
     uint8_t*   memory;
 
     struct ConditionCodes  cc;    
-    uint8_t     int_enable;
-
+    bool     int_enable;
 
     // Space Invaders Dedicated Shift Hardware
     ExternalDevices external_devices;

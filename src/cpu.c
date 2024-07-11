@@ -801,7 +801,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             }
             break; 
         }   
-        case 0xf3: break;    
+        case 0xf3: state->int_enable = false; break;                // DI    
         case 0xf4: {                 // CP adr
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -859,7 +859,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             }
             break; 
         }   
-        case 0xfb: break;    
+        case 0xfb: state->int_enable = true; break;             // EI
         case 0xfc: {                 // 	CM adr
             if (state->cc.s) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -1056,13 +1056,11 @@ State8080* init_8080_state(void) {
     }
 
 	state->memory = (uint8_t*) malloc(0x10000);
-
     if (state->memory == NULL) {
         printf("Error allocating memory for memory buffer.\n");
         exit(1);
     }
 
     memset(state->memory, 0x0, 0x1000);
-
 	return state;
 }
