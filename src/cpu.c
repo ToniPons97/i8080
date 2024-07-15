@@ -1202,10 +1202,13 @@ void dad(State8080* state, uint16_t num) {
     state->l = hl & 0xff;
 }
 
- void generate_interrupt(State8080* state, int interrupt_num) {
-    push(state, (state->pc & 0xFF00) >> 8, (state->pc & 0xff));
-    state->pc = 8 * interrupt_num;    
+void generate_interrupt(State8080* state, int interrupt_num) {
+    if (state != NULL && interrupt_num >= 0 && interrupt_num <= 7) {
+        push(state, (state->pc >> 8) & 0xff, (state->pc & 0xff));
+        state->pc = 8 * interrupt_num;
+    }
 }
+
 
 State8080* init_8080_state(void) {
     State8080* state = NULL;
@@ -1218,7 +1221,7 @@ State8080* init_8080_state(void) {
 
     state->t_states = 0;
 
-	state->memory = (uint8_t*) malloc(0x10000);
+	state->memory = (uint8_t*) malloc(16 * 0x1000);
     if (state->memory == NULL) {
         printf("Error allocating memory for memory buffer.\n");
         exit(1);
