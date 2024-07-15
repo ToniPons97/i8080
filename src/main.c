@@ -4,12 +4,14 @@
 #include "debugger.h"
 #include "display.h"
 #include "si_machine_io.h"
+#include <time.h>
 
 void print_banner(void);
 int handle_program_init(int argc, char** argv);
 void debug_space_invaders();
 void run_space_invaders();
 void run_cpudiag();
+double get_current_time();
 
 struct termios original;
 SDL_Window* MAIN_WINDOW = NULL;
@@ -106,6 +108,16 @@ void run_space_invaders() {
         handle_sdl_events(&key_state, &event, &quit);
         emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
+
+        double last_interrupt = 0.0;
+
+        if (get_current_time() - last_interrupt > 1.0 / 60.0) {
+            if (state->int_enable) {
+                printf("Processing an interrupt\n");
+                generate_interrupt(state, 2);
+                last_interrupt = get_current_time();
+            }
+        }
         //SDL_Delay(1000 / 60);
         /*
             printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
@@ -116,7 +128,7 @@ void run_space_invaders() {
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
-
+    
     if (state != NULL) {
         free(state);
     }
@@ -196,6 +208,10 @@ int handle_program_init(int argc, char** argv) {
         default:
             return -1;
     }
+}
+
+double get_current_time() {
+    return (double)clock() / CLOCKS_PER_SEC;
 }
 
 void print_banner() {
