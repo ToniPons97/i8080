@@ -103,13 +103,13 @@ void run_space_invaders() {
 
     bool quit = false;
     SDL_Event event;
+    double last_interrupt = 0.0;
 
     while (!quit && state->pc < rom_buffer_size) {
         handle_sdl_events(&key_state, &event, &quit);
         emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
 
-        double last_interrupt = 0.0;
 
         if (get_current_time() - last_interrupt > 1.0 / 60.0) {
             if (state->int_enable) {
@@ -118,18 +118,12 @@ void run_space_invaders() {
                 last_interrupt = get_current_time();
             }
         }
-        //SDL_Delay(1000 / 60);
-        /*
-            printf("C pressed? %d\n", get_key_state(&key_state, 'c'));
-            printf("SPACE pressed? %d\n", get_key_state(&key_state, ' '));
-            printf("LEFT pressed? %d\n", get_key_state(&key_state, 'a'));
-            printf("RIGHT pressed? %d\n", get_key_state(&key_state, 'd'));
-        */
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
     
     if (state != NULL) {
+        free(state->memory);
         free(state);
     }
 }
