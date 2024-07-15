@@ -1202,6 +1202,11 @@ void dad(State8080* state, uint16_t num) {
     state->l = hl & 0xff;
 }
 
+ void generate_interrupt(State8080* state, int interrupt_num) {
+    push(state, (state->pc & 0xFF00) >> 8, (state->pc & 0xff));
+    state->pc = 8 * interrupt_num;    
+}
+
 State8080* init_8080_state(void) {
     State8080* state = NULL;
     
@@ -1219,6 +1224,6 @@ State8080* init_8080_state(void) {
         exit(1);
     }
 
-    memset(state->memory, 0x0, 0x1000);
+    memset(state->memory, 0x0, 0x10000);
 	return state;
 }
