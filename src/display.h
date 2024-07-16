@@ -7,8 +7,8 @@
 #include "common_values.h"
 #include "keyboard_state.h"
 
-#define SCREEN_WIDTH 256
-#define SCREEN_HEIGHT 324
+#define SCREEN_WIDTH 224
+#define SCREEN_HEIGHT 256
 #define SCALE 2
 
 void initialize_sdl();

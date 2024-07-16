@@ -85,7 +85,8 @@ void handle_sdl_events(KeyboardMap* keyboard_state, SDL_Event* event, bool* quit
 void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
     SDL_KeyCode keycode = event->key.keysym.sym;
     if (event->type == SDL_KEYDOWN) {
-        if (keycode == SDLK_SPACE || 
+        if (keycode == SDLK_1 ||
+            keycode == SDLK_SPACE || 
             keycode == SDLK_a || 
             keycode == SDLK_d || 
             keycode == SDLK_c ||
@@ -97,7 +98,8 @@ void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
     }
 
     if (event->type == SDL_KEYUP) {
-        if (keycode == SDLK_SPACE || 
+        if (keycode == SDLK_1 ||
+            keycode == SDLK_SPACE || 
             keycode == SDLK_a || 
             keycode == SDLK_d || 
             keycode == SDLK_c ||
