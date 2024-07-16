@@ -107,7 +107,7 @@ void run_space_invaders() {
     double next_interrupt = 0.0;
     int which_interrupt = 1;
 
-    while (!quit && state->pc < rom_buffer_size) {
+    while (!quit) {
         handle_sdl_events(&key_state, &event, &quit);
         emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
