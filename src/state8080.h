@@ -36,7 +36,7 @@ typedef struct State8080 {
     uint8_t*   memory;
 
     struct ConditionCodes  cc;    
-    bool     int_enable;
+    bool     interrupt_enable;
     uint64_t t_states;
 
     // Space Invaders Dedicated Shift Hardware
