@@ -10,8 +10,29 @@ void unimplemented_instruction(State8080* state) {
     exit(1);    
 }
 
+uint16_t last_sp = 0;
+
 bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_state) {    
-    unsigned char *opcode = &state->memory[state->pc];    
+    unsigned char *opcode = &state->memory[state->pc];
+    /*
+        if ((state->sp != 0) && (state->sp < 0x2300)) {
+            printf("Stack getting dangerously low 0x%.4x\n", state->sp);    
+        } 
+
+        // Alert If more than 2 bytes have changed in the stack since last time    
+        if ( abs(last_sp - state->sp) > 2) {
+            printf("\nStack Squash?\n\nPC: 0x%.4x\nLast SP: 0x%.4x\nCurrent SP: 0x%.4x\n\n", state->pc, last_sp, state->sp);    
+        last_sp = state->sp;
+        }
+    */
+
+    if (state->pc == 0x8) {
+        printf("RST 1\n");
+    } else if (state->pc == 0x10) {
+        printf("RST 2\n");    
+    } else if (state->pc == 0x87) {
+        printf("Leaving RST\n");
+    }
 
     switch(*opcode) {    
         case 0x00: state->t_states += 4; break;           // NOP    
@@ -943,7 +964,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             state->pc += 2;
             break; 
         }   
-        case 0xf3: state->int_enable = false; state->t_states += 4; break;                // DI    
+        case 0xf3: state->interrupt_enable = false; state->t_states += 4; break;                // DI    
         case 0xf4: {                 // CP adr
             if (state->cc.p) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -1010,7 +1031,7 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             state->pc += 2;
             break; 
         }   
-        case 0xfb: state->int_enable = true; state->t_states += 4; break;             // EI
+        case 0xfb: state->interrupt_enable = true; state->t_states += 4; break;             // EI
         case 0xfc: {                 // 	CM adr
             if (state->cc.s) {
                 uint16_t address = (opcode[2] << 8) | opcode[1];
@@ -1041,9 +1062,7 @@ void call(State8080* state, uint16_t address) {
     uint8_t pc_hi = (state->pc >> 8) & 0xff;
     uint8_t pc_lo = state->pc & 0xff;
     
-    state->memory[state->sp - 1] = pc_hi;
-    state->memory[state->sp - 2] = pc_lo;
-    state->sp -= 2;
+    push(state, pc_hi, pc_lo);
     state->pc = address;
 }
 
@@ -1206,6 +1225,7 @@ void generate_interrupt(State8080* state, int interrupt_num) {
     if (state != NULL && interrupt_num >= 0 && interrupt_num <= 7) {
         push(state, (state->pc >> 8) & 0xff, (state->pc & 0xff));
         state->pc = 8 * interrupt_num;
+        state->interrupt_enable = false;
     }
 }
 
@@ -1224,6 +1244,7 @@ State8080* init_8080_state(void) {
 	state->memory = (uint8_t*) malloc(16 * 0x1000);
     if (state->memory == NULL) {
         printf("Error allocating memory for memory buffer.\n");
+        free(state);
         exit(1);
     }
 
