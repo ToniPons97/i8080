@@ -213,24 +213,24 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             break;
         }
 
-    case 0x27: {                          //DAA    
-        if ((state->a &0xf) > 9) {
-            state->a += 6;
+        case 0x27: {                          //DAA    
+            if ((state->a &0xf) > 9) {
+                state->a += 6;
+            }
+
+            if ((state->a&0xf0) > 0x90) {    
+                uint16_t res = (uint16_t) state->a + 0x60;    
+                state->a = res & 0xff;
+
+                state->cc.cy = res > 0xff;
+                state->cc.p = parity(state->a);
+                state->cc.z = (state->a & 0xff) == 0;
+                state->cc.s = (state->a & 0x80) != 0;
+            }
+
+            state->t_states += 4;
+            break;
         }
-
-        if ((state->a&0xf0) > 0x90) {    
-            uint16_t res = (uint16_t) state->a + 0x60;    
-            state->a = res & 0xff;
-
-            state->cc.cy = res > 0xff;
-            state->cc.p = parity(state->a);
-            state->cc.z = (state->a & 0xff) == 0;
-            state->cc.s = (state->a & 0x80) != 0;
-        }
-
-        state->t_states += 4;
-        break;
-    }
  
         case 0x28: break;    
         case 0x29: {                  // DAD H
@@ -1212,7 +1212,6 @@ void generate_interrupt(State8080* state, int interrupt_num) {
         state->interrupt_enable = false;
     }
 }
-
 
 State8080* init_8080_state(void) {
     State8080* state = NULL;
