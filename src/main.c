@@ -85,7 +85,7 @@ void debug_space_invaders() {
     restore_mode(&original);
 }
 
-void run_space_invaders() {    
+void run_space_invaders() {
     State8080* state = init_8080_state();
     load_space_invaders_rom(state, &rom_buffer_size);
 
@@ -104,24 +104,43 @@ void run_space_invaders() {
     bool quit = false;
     SDL_Event event;
     double last_interrupt = 0.0;
+    double next_interrupt = 0.0;
+    int which_interrupt = 1;
 
     while (!quit && state->pc < rom_buffer_size) {
         handle_sdl_events(&key_state, &event, &quit);
         emulate_i8080(state, &io, &key_state);
         render_screen(state->memory, MAIN_RENDERER);
 
+        // Emulate CPU and handle interrupts
+        double now = get_current_time();
 
-        if (get_current_time() - last_interrupt > 1.0 / 60.0) {
-            if (state->int_enable) {
-                printf("Processing an interrupt\n");
-                generate_interrupt(state, 2);
-                last_interrupt = get_current_time();
-            }
+        //printf("last_interrupt: %lf\nnext_interrupt: %lf\nnow: %lf\n", last_interrupt, next_interrupt, now);
+        
+        if (last_interrupt == 0.0) {
+            last_interrupt = now;
+            next_interrupt = last_interrupt +  0.016667;
+            which_interrupt = 1;
         }
+        
+        if (state->interrupt_enable && now > next_interrupt) {
+            if (which_interrupt == 1) {
+                generate_interrupt(state, 1);
+                which_interrupt = 2;
+            } else {
+                generate_interrupt(state, 2);
+                which_interrupt = 1;
+            }
+
+            next_interrupt = now + 0.008333;
+        }
+
+        // Update last interrupt time
+        last_interrupt = now;
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
-    
+
     if (state != NULL) {
         free(state->memory);
         free(state);
@@ -205,7 +224,7 @@ int handle_program_init(int argc, char** argv) {
 }
 
 double get_current_time() {
-    return (double)clock() / CLOCKS_PER_SEC;
+    return (double) clock() / CLOCKS_PER_SEC;
 }
 
 void print_banner() {
