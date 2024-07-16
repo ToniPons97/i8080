@@ -1,6 +1,7 @@
 #ifndef SI_MACHINE_IO_H
 #define SI_MACHINE_IO_H
 
+#include <stdio.h>
 #include "state8080.h"
 #include "keyboard_state.h"
 

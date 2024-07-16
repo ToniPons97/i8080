@@ -49,17 +49,19 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
             }
 
             // bit 1 = 2P start (1 if pressed)
-            if (get_key_state(keyboard_state, '1')) {
+            if (get_key_state(keyboard_state, '2')) {
                 input_port |= (1 << 1);
             } else {
                 input_port &= ~(1 << 1);
             }
 
             // bit 2 = 1P start (1 if pressed)
-            if (get_key_state(keyboard_state, '2')) {
+            if (get_key_state(keyboard_state, '1')) {
                 input_port |= (1 << 2);
+                //printf("%.4x\n", input_port);
             } else {
                 input_port &= ~(1 << 2);
+                //printf("%.4x\n", input_port);
             }
             
             // bit 3 = Always 1
@@ -89,6 +91,8 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
             // bit 7 = Not connected
             // Always 0 for emulation purposes
             input_port &= ~(1 << 7);
+
+            //printf("Input port 1: %.8x\n", input_port);
 
             return input_port;
 
@@ -130,7 +134,7 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
             input_port |= (1 << 7);
 
             return input_port;
-            
+
         case 3:
             uint16_t a = 0;
             uint16_t v = (state->external_devices.shift_registers.shift1 << 8) | state->external_devices.shift_registers.shift0;    
@@ -148,6 +152,9 @@ void si_machine_out(State8080* state, uint8_t port) {
     // Implement the OUT operation
 
     switch (port) {
+        case 2:
+            state->external_devices.shift_registers.shift0 = state->a & 0x7;
+            break;
         case 4:
             // Not sure if this is right.
             state->external_devices.shift_registers.shift0 = state->external_devices.shift_registers.shift1;
