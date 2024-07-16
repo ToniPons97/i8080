@@ -211,38 +211,22 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             state->pc += 1;
             state->t_states += 7;
             break;
-        }    
-    case 0x27: {                // DAA
-        uint8_t ls_nibble = state->a & 0x0F;
-        uint8_t ms_nibble = (state->a & 0xF0) >> 4;
-        
-        uint8_t correction = 0;
-
-        if (ls_nibble > 9 || state->cc.ac == 1) {
-            correction = 0x06;
         }
 
-        if (ms_nibble > 9 || state->cc.cy == 1) {
-            correction |= 0x60;  
+    case 0x27: {                          //DAA    
+        if ((state->a &0xf) > 9) {
+            state->a += 6;
         }
 
-        uint16_t result = state->a + correction;
+        if ((state->a&0xf0) > 0x90) {    
+            uint16_t res = (uint16_t) state->a + 0x60;    
+            state->a = res & 0xff;
 
-        if ((state->a & 0x0F) + (correction & 0x0F) > 0x0F) {
-            state->cc.ac = 1;
-        } else {
-            state->cc.ac = 0;
+            state->cc.cy = res > 0xff;
+            state->cc.p = parity(state->a);
+            state->cc.z = (state->a & 0xff) == 0;
+            state->cc.s = (state->a & 0x80) != 0;
         }
-
-        if (result > 0xFF) {
-            state->cc.cy = 1;
-        }
-
-        state->a = result & 0xFF;
-
-        state->cc.p = parity(state->a);
-        state->cc.z = (state->a & 0xff) == 0;
-        state->cc.s = (state->a & 0x80) != 0;
 
         state->t_states += 4;
         break;
