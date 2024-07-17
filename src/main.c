@@ -4,14 +4,14 @@
 #include "debugger.h"
 #include "display.h"
 #include "si_machine_io.h"
-#include <time.h>
+#include <sys/time.h>
 
 void print_banner(void);
 int handle_program_init(int argc, char** argv);
-void debug_space_invaders();
-void run_space_invaders();
-void run_cpudiag();
-double get_current_time();
+void debug_space_invaders(void);
+void run_space_invaders(void);
+void run_cpudiag(void);
+long long get_current_time(void);
 
 struct termios original;
 SDL_Window* MAIN_WINDOW = NULL;
@@ -103,27 +103,23 @@ void run_space_invaders() {
 
     bool quit = false;
     SDL_Event event;
-    double last_interrupt = 0.0;
-    double next_interrupt = 0.0;
+    long long last_interrupt = 0;
+    long long next_interrupt = 0;
     int which_interrupt = 1;
 
     while (!quit) {
         handle_sdl_events(&key_state, &event, &quit);
         emulate_i8080(state, &io, &key_state);
-        render_screen(state->memory, MAIN_RENDERER);
 
-        // Emulate CPU and handle interrupts
-        double now = get_current_time();
-
-        //printf("last_interrupt: %lf\nnext_interrupt: %lf\nnow: %lf\n", last_interrupt, next_interrupt, now);
+        long long now = get_current_time();
         
-        if (last_interrupt == 0.0) {
+        if (last_interrupt == 0) {
             last_interrupt = now;
-            next_interrupt = last_interrupt +  0.016667;
+            next_interrupt = last_interrupt + 16000;
             which_interrupt = 1;
         }
         
-        if (state->interrupt_enable && now > next_interrupt) {
+        if (state->interrupt_enable && now >= next_interrupt) {
             if (which_interrupt == 1) {
                 generate_interrupt(state, 1);
                 which_interrupt = 2;
@@ -132,11 +128,13 @@ void run_space_invaders() {
                 which_interrupt = 1;
             }
 
-            next_interrupt = now + 0.008333;
+            next_interrupt = now + 8333;
         }
 
-        // Update last interrupt time
-        last_interrupt = now;
+        if (now - last_interrupt >= 16667) {
+            render_screen(state->memory, MAIN_RENDERER);
+            last_interrupt = now;
+        }
     }
 
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
@@ -147,7 +145,8 @@ void run_space_invaders() {
     }
 }
 
-void run_cpudiag() {
+
+void run_cpudiag(void) {
     set_raw_mode(&original);
 
     State8080* state = init_8080_state();
@@ -223,11 +222,13 @@ int handle_program_init(int argc, char** argv) {
     }
 }
 
-double get_current_time() {
-    return (double) clock() / CLOCKS_PER_SEC;
-}
 
-void print_banner() {
+long long get_current_time(void) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return ((long long) tv.tv_sec * 1000000LL) + (tv.tv_usec);
+}
+void print_banner(void) {
     printf("==============================================================================\n");
     printf("=                                                                            =\n");
     printf("=                          Intel 8080 Emulator                               =\n");

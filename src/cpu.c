@@ -28,9 +28,13 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
 
     if (state->pc == 0x8) {
         printf("RST 1\n");
-    } else if (state->pc == 0x10) {
+    } 
+    
+    if (state->pc == 0x10) {
         printf("RST 2\n");    
-    } else if (state->pc == 0x87) {
+    }
+    
+    if (state->pc == 0x87) {
         printf("Leaving RST\n");
     }
 
