@@ -14,17 +14,15 @@ uint16_t last_sp = 0;
 
 bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_state) {    
     unsigned char *opcode = &state->memory[state->pc];
-    /*
-        if ((state->sp != 0) && (state->sp < 0x2300)) {
-            printf("Stack getting dangerously low 0x%.4x\n", state->sp);    
-        } 
 
-        // Alert If more than 2 bytes have changed in the stack since last time    
-        if ( abs(last_sp - state->sp) > 2) {
-            printf("\nStack Squash?\n\nPC: 0x%.4x\nLast SP: 0x%.4x\nCurrent SP: 0x%.4x\n\n", state->pc, last_sp, state->sp);    
-        last_sp = state->sp;
-        }
-    */
+    if ((state->sp != 0) && (state->sp < 0x2300)) {
+        printf("Stack getting dangerously low 0x%.4x\n", state->sp);    
+    } 
+
+    if ( abs(last_sp - state->sp) > 2) {
+        printf("\nStack Squash?\n\nPC: 0x%.4x\nLast SP: 0x%.4x\nCurrent SP: 0x%.4x\n\n", state->pc, last_sp, state->sp);    
+    last_sp = state->sp;
+    }
 
     if (state->pc == 0x8) {
         printf("RST 1\n");
@@ -169,8 +167,8 @@ bool emulate_i8080(State8080* state, IOInterface* io, KeyboardMap* keyboard_stat
             state->t_states += 5;
             break;
         }    
-        case 0x1c: inr(state, &state->e); state->t_states += 5; break;            // INR E 
-        case 0x1d: dcr(state, &state->e); state->t_states += 5; break;            // DCR E   
+        case 0x1c: inr(state, &state->e); state->t_states += 5; break;            // INR E
+        case 0x1d: dcr(state, &state->e); state->t_states += 5; break;            // DCR E
         case 0x1e: {                  // MVI E,D8 
             state->e = opcode[1];
             state->pc += 1;
