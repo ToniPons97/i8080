@@ -277,7 +277,7 @@ void print_cpu_status(State8080* state) {
     printf("AC: 0x%.2x    P:  0x%.2x    PC: ", state->cc.ac, state->cc.p);
     disassemble(state->memory, state->pc);
     printf("\nT-States: %ld\n", state->t_states);
-    printf("Interrupt enabled? %s\n", state->int_enable ? "Yes" : "No");
+    printf("Interrupt enabled? %s\n", state->interrupt_enable ? "Yes" : "No");
     printf("\n=========================== END OF CPU STATUS ============================\n\n");
 }
 
