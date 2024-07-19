@@ -79,6 +79,7 @@ void debug_space_invaders() {
     sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
 
     if (state != NULL) {
+        free(state->memory);
         free(state);
     }
 
@@ -103,47 +104,48 @@ void run_space_invaders() {
 
     bool quit = false;
     SDL_Event event;
-    long long last_interrupt = 0;
-    long long next_interrupt = 0;
+    long long last_interrupt_time = 0;
+    long long next_interrupt_time = 0;
     int which_interrupt = 1;
 
     while (!quit) {
         handle_sdl_events(&key_state, &event, &quit);
-        emulate_i8080(state, &io, &key_state);
-
+        
+        // Emulate CPU cycles until the next expected interrupt
         long long now = get_current_time();
-        
-        if (last_interrupt == 0) {
-            last_interrupt = now;
-            next_interrupt = last_interrupt + 16000;
-            which_interrupt = 1;
+        while (get_current_time() < next_interrupt_time) {
+            emulate_i8080(state, &io, &key_state);
         }
-        
-        if (state->interrupt_enable && now >= next_interrupt) {
+
+        // Handle interrupt
+        if (state->interrupt_enable) {
             if (which_interrupt == 1) {
-                generate_interrupt(state, 1);
+                generate_interrupt(state, 1); // VBlank interrupt
                 which_interrupt = 2;
             } else {
-                generate_interrupt(state, 2);
+                generate_interrupt(state, 2); // Mid-frame interrupt
                 which_interrupt = 1;
             }
-
-            next_interrupt = now + 8333;
         }
 
-        if (now - last_interrupt >= 16667) {
+        // Update timing for next interrupt
+        last_interrupt_time = now;
+        next_interrupt_time = last_interrupt_time + 8000; // 8ms for 2 interrupts in 16ms frame
+
+        // Render the screen at VBlank
+        if (which_interrupt == 1) {
             render_screen(state->memory, MAIN_RENDERER);
-            last_interrupt = now;
         }
     }
-
-    sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
 
     if (state != NULL) {
         free(state->memory);
         free(state);
     }
+
+    sdl_cleanup(MAIN_WINDOW, MAIN_RENDERER);
 }
+
 
 
 void run_cpudiag(void) {
@@ -178,6 +180,7 @@ void run_cpudiag(void) {
     }
 
     if (state != NULL) {
+        free(state->memory);
         free(state);
     }
 
@@ -197,7 +200,7 @@ int handle_program_init(int argc, char** argv) {
     switch (argc) {
         case 2:
             if (strncmp(invaders, argv[1], sizeof(invaders) / sizeof(invaders[0])) == 0) {
-                printf("Should run Space Invaders in play mode.\n");
+                printf("Running Space Invaders...\n");
                 return 0;
             } else {
                 printf("Should run some other file if it exists.\n");
@@ -222,12 +225,12 @@ int handle_program_init(int argc, char** argv) {
     }
 }
 
-
 long long get_current_time(void) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return ((long long) tv.tv_sec * 1000000LL) + (tv.tv_usec);
 }
+
 void print_banner(void) {
     printf("==============================================================================\n");
     printf("=                                                                            =\n");
