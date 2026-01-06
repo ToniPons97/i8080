@@ -1664,15 +1664,12 @@ State8080* init_8080_state(void) {
         exit(1);
     }
 
-    state->t_states = 0;
-
-    state->memory = (uint8_t*)malloc(16 * 0x1000);
+    state->memory = (uint8_t*)calloc(16, I8080_MEM_SIZE);
     if (state->memory == NULL) {
-        printf("Error allocating memory for memory buffer.\n");
+        printf("Error allocating memory for memory buffer\n");
         free(state);
         exit(1);
     }
 
-    memset(state->memory, 0x0, 0x10000);
     return state;
 }
