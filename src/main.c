@@ -131,7 +131,7 @@ void run_space_invaders() {
         // Update timing for next interrupt
         last_interrupt_time = now;
         next_interrupt_time =
-            last_interrupt_time + 8000; // 8ms for 2 interrupts in 16ms frame
+            last_interrupt_time + 16000; // 8ms for 2 interrupts in 16ms frame
 
         // Render the screen at VBlank
         if (which_interrupt == 1) {
