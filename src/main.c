@@ -4,14 +4,12 @@
 #include "si_machine_io.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 void print_banner(void);
 int handle_program_init(int argc, char** argv);
 void debug_space_invaders(void);
 void run_space_invaders(void);
 void run_cpudiag(void);
-long long get_current_time(void);
 
 struct termios original;
 SDL_Window* MAIN_WINDOW = NULL;
@@ -104,39 +102,28 @@ void run_space_invaders() {
 
     bool quit = false;
     SDL_Event event;
-    long long last_interrupt_time = 0;
-    long long next_interrupt_time = 0;
-    int which_interrupt = 1;
-
+    int T_STATES_PER_FRAME = 33333;
+    bool int1_fired = false;
+    
     while (!quit) {
+        emulate_i8080(state, &io, &key_state);
         handle_sdl_events(&key_state, &event, &quit);
-
-        // Emulate CPU cycles until the next expected interrupt
-        long long now = get_current_time();
-        while (get_current_time() < next_interrupt_time) {
-            emulate_i8080(state, &io, &key_state);
-        }
-
+        render_screen(state->memory, MAIN_RENDERER);
+        
         // Handle interrupt
         if (state->interrupt_enable) {
-            if (which_interrupt == 1) {
-                generate_interrupt(state, 1); // VBlank interrupt
-                which_interrupt = 2;
-            } else {
-                generate_interrupt(state, 2); // Mid-frame interrupt
-                which_interrupt = 1;
+            if (state->t_states > T_STATES_PER_FRAME / 2 && !int1_fired) {
+                generate_interrupt(state, 1);
+                int1_fired = true;
+            }
+            
+            if (state->t_states >= T_STATES_PER_FRAME) {
+                generate_interrupt(state, 2);
+                state->t_states -= T_STATES_PER_FRAME;
+                int1_fired = false;
             }
         }
 
-        // Update timing for next interrupt
-        last_interrupt_time = now;
-        next_interrupt_time =
-            last_interrupt_time + 16000; // 8ms for 2 interrupts in 16ms frame
-
-        // Render the screen at VBlank
-        if (which_interrupt == 1) {
-            render_screen(state->memory, MAIN_RENDERER);
-        }
     }
 
     if (state != NULL) {
@@ -230,12 +217,6 @@ int handle_program_init(int argc, char** argv) {
     default:
         return -1;
     }
-}
-
-long long get_current_time(void) {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return ((long long)tv.tv_sec * 1000000LL) + (tv.tv_usec);
 }
 
 void print_banner(void) {

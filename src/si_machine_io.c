@@ -6,7 +6,7 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
         case 0:
             // bit 0 DIP4 (Seems to be self-test-request read at power up)
             // Always 1 for emulation purposes
-            input_port |= (1 << 0);
+            input_port &= ~(1 << 0);
             
             // bit 1, 2, 3 Always 1
             input_port |= (1 << 1);
@@ -58,7 +58,7 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
             // bit 2 = 1P start (1 if pressed)
             if (get_key_state(keyboard_state, '1')) {
                 input_port |= (1 << 2);
-                //printf("%.4x\n", input_port);
+                // printf("%.4x\n", input_port);
             } else {
                 input_port &= ~(1 << 2);
                 //printf("%.4x\n", input_port);
@@ -91,9 +91,7 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
             // bit 7 = Not connected
             // Always 0 for emulation purposes
             input_port &= ~(1 << 7);
-
             //printf("Input port 1: %.8x\n", input_port);
-
             return input_port;
 
         case 2:
@@ -144,6 +142,7 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
         default:
             break;
     }
+
     // Implement the IN operation
     return 0;
 }
