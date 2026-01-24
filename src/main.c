@@ -4,12 +4,14 @@
 #include "si_machine_io.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <sched.h>
 
 void print_banner(void);
 int handle_program_init(int argc, char** argv);
 void debug_space_invaders(void);
 void run_space_invaders(void);
 void run_cpudiag(void);
+static inline void detect_cpu_migration(int* last_cpu);
 
 struct termios original;
 SDL_Window* MAIN_WINDOW = NULL;
@@ -104,6 +106,7 @@ void run_space_invaders() {
     SDL_Event event;
     int T_STATES_PER_FRAME = 33333;
     bool int1_fired = false;
+    int old_cpu_code = -1;
     
     while (!quit) {
         emulate_i8080(state, &io, &key_state);
@@ -112,15 +115,18 @@ void run_space_invaders() {
         
         // Handle interrupt
         if (state->interrupt_enable) {
+            // mid-frame interrupt
             if (state->t_states > T_STATES_PER_FRAME / 2 && !int1_fired) {
                 generate_interrupt(state, 1);
                 int1_fired = true;
             }
             
+            // vblank interrupt
             if (state->t_states >= T_STATES_PER_FRAME) {
                 generate_interrupt(state, 2);
                 state->t_states -= T_STATES_PER_FRAME;
                 int1_fired = false;
+                detect_cpu_migration(&old_cpu_code);
             }
         }
 
@@ -236,4 +242,12 @@ void print_banner(void) {
            "          =\n");
     printf("==================================================================="
            "===========\n\n");
+}
+
+static inline void detect_cpu_migration(int* last_cpu) {
+    int cpu_core = sched_getcpu();
+    if (cpu_core != *last_cpu) {
+        printf("Running on cpu core %d\n", cpu_core);
+        *last_cpu = cpu_core;
+    }
 }
