@@ -1,7 +1,7 @@
 #include "display.h"
 
 void initialize_sdl() {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         exit(1);
     }
@@ -112,7 +112,13 @@ void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
 }
 
 void sdl_cleanup(SDL_Window* window, SDL_Renderer* renderer) {
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
+    /* Destroy renderer before window; destroying the window can invalidate
+     * the renderer and cause double-free if we destroy in wrong order. */
+    if (renderer != NULL) {
+        SDL_DestroyRenderer(renderer);
+    }
+    if (window != NULL) {
+        SDL_DestroyWindow(window);
+    }
     SDL_Quit();
 }

@@ -1391,12 +1391,11 @@ bool emulate_i8080(State8080* state, IOInterface* io,
         state->t_states += 11;
         break;
     }
-    case 0xf5: { // PUSH PSW
-        uint16_t psw =
-            (state->a << 8) | ((state->cc.s & 0x80) | (state->cc.z & 0x40) |
-                               (state->cc.ac & 0x10) | (state->cc.p & 0x04) |
-                               (state->cc.cy & 0x01));
-
+    case 0xf5: { // PUSH PSW — 8080 flags byte: S(7) Z(6) 0(5) AC(4) 0(3) P(2) 1(1) C(0)
+        uint8_t flags = (state->cc.s ? 0x80u : 0) | (state->cc.z ? 0x40u : 0) |
+                        (state->cc.ac ? 0x10u : 0) | (state->cc.p ? 0x04u : 0) |
+                        0x02u | (state->cc.cy ? 0x01u : 0);
+        uint16_t psw = (state->a << 8) | flags;
         state->memory[state->sp - 1] = (psw >> 8) & 0xff;
         state->memory[state->sp - 2] = psw & 0xff;
         state->sp -= 2;

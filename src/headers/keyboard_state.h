@@ -7,10 +7,12 @@
 
 typedef struct {
     bool state[MAX_KEYS];
+    int prev[MAX_KEYS];
 } KeyboardMap;
 
 void init_keyboard_state(KeyboardMap* keyboard_state);
 void set_key_state(KeyboardMap* keyboard_state, int key, bool pressed);
 bool get_key_state(KeyboardMap* keyboard_state, int key);
+void keyboard_end_frame(KeyboardMap* kbd);
 
 #endif
