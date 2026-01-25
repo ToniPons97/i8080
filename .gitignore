@@ -2,3 +2,4 @@ src/*.o
 src/invaders*
 src/main
 .vscode
+invaders*

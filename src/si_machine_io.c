@@ -115,7 +115,6 @@ uint8_t si_machine_in(State8080* state, uint8_t port, KeyboardMap* keyboard_stat
 
             // bit 7 = DIP7 Coin info displayed in demo screen 0=ON
             input_port |= (1 << 7);
-
             return input_port;
 
         case 3:

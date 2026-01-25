@@ -83,7 +83,7 @@ void handle_sdl_events(KeyboardMap* keyboard_state, SDL_Event* event, bool* quit
 
 // SPACE (fire) | a (left) | d (right) |  c (coin insertion) | y (p2 left) | i (p2 right) | l (p2 fire)
 void handle_keyboard_events(KeyboardMap* keyboard_state, SDL_Event* event) {
-    SDL_KeyCode keycode = event->key.keysym.sym;
+SDL_KeyCode keycode = event->key.keysym.sym;
     if (event->type == SDL_KEYDOWN) {
         if (keycode == SDLK_1 ||
             keycode == SDLK_SPACE || 
